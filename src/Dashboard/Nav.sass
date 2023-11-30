@@ -1,0 +1,317 @@
+.SideNav
+    display: flex
+    flex-direction: column
+    padding: 1rem .7rem
+    width: 16vw
+    background: #ffffff
+    height: 100vh
+    position: fixed
+    border: 1px solid #f5f5f5
+    justify-content: space-between
+    font-size: .9rem
+
+    ul
+        display: flex
+        flex-direction: column
+        gap: .5rem
+
+        li
+            display: flex
+            flex-direction: row
+            gap: 1rem
+            padding: .6rem 1rem
+            border-radius: 6px
+            align-items: flex-start
+            cursor: pointer
+
+        li:hover
+            font-weight: 600
+
+        .new
+            background: #4CA5F1
+            color: white
+            font-weight: 600
+
+            .nav_icon
+                color: white
+
+        .nav_icon
+            width: 1.1rem
+
+    .opened_tab
+        background: #0f73cb08
+        color: #4CA5F1
+
+    ul:nth-child(1)
+        display: flex
+        flex-direction: column
+        gap: 3rem
+
+
+// Lil Nav
+.LilNav
+    border: 1px solid #f5f5f5
+    border-left: none
+    padding: .8rem 2rem
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    background: #ffffff
+    align-items: center
+    font-size: .9rem
+    width: 84vw
+
+    .nav_title
+        font-weight: 600
+        font-size: 1.1rem
+
+    .profile_picture
+        width: 2rem
+        height: 2rem
+        border-radius: 50px
+
+    ul
+        display: flex
+        flex-direction: row
+        text-transform: capitalize
+        justify-content: center
+        align-items: center
+        gap: 1rem
+
+        li
+            display: flex
+            flex-direction: row
+            align-items: center
+            gap: .5rem
+
+    .profile_icon
+        border: 1.5px solid #4ca4f1ab
+        padding: .1rem
+        box-sizing: border-box
+        width: 1.5rem
+        height: 1.5rem
+        border-radius: 50px
+
+
+// request pop up
+.popup
+    width: 50vw
+    margin-left: 16vw
+    padding: 0
+    padding: 0
+    height: fit-content
+    border-radius: 0
+    box-sizing: border-box
+
+    .container
+        width: 100%
+        margin: 0
+        display: flex!important
+        flex-direction: column
+        align-items: flex-start
+        justify-content: flex-start
+        font-size: .9rem
+        box-sizing: border-box
+
+        .title_bar:nth-child(1)
+            background: rgba(74, 160, 213, 0.15)
+            height: 2.9rem
+            padding: .5rem 1.5rem
+            display: flex
+            justify-content: space-between
+            align-items: center
+            width: 100%
+            box-sizing: border-box
+            color: #515050
+
+            img
+                width: 1.2rem
+
+        input
+            width: 94%
+            border: none
+            padding: 0
+            margin: 0 3%
+            border-bottom: 1px solid rgba(155, 154, 154, 0.2)
+            border-top: 0
+            outline: 0
+            box-sizing: border-box
+            font-size: .9rem
+            height: 2.5rem
+
+        input:focus, textarea:focus
+            outline: none
+            box-shadow: none
+
+        textarea
+            background: white
+            border: none
+            box-sizing: border-box
+            resize: none
+            height: 40vh
+            width: 94%
+            padding: 1rem 0
+            margin: 0 3%
+            font-size: .9rem
+            color: black
+
+        .swal3-input
+            display: flex
+            flex-direction: row
+            align-items: flex-start
+            padding: 0 1.5rem
+            gap: .5rem
+            flex-wrap: wrap
+
+            div
+                background: #d5d2d2bf
+                padding: .5rem
+                display: flex
+                flex-direction: row
+                gap: .5rem
+                font-size: .8rem
+                width: fit-content
+
+                img
+                    width: .8rem
+                    cursor: pointer
+
+        .last_div
+            display: flex
+            flex-direction: row
+            justify-content: space-between
+            width: 94%
+            margin: 1rem 3%
+            height: 3rem
+            align-items: center
+
+            .left_icons
+                display: flex
+                flex-direction: row
+                gap: .9rem
+                width: 16rem
+                align-items: center
+
+                .fileinputs
+                    position: relative
+                    width: 2rem
+                    height: 1.5rem
+
+                    .fakefile
+                        position: absolute
+                        top: 0px
+                        left: 0px
+                        z-index: 1
+
+                    .file
+                        position: relative
+                        text-align: right
+                        -moz-opacity: 0
+                        opacity: 0
+                        z-index: 2
+
+        img
+            width: 1.5rem
+
+        .button
+            background: #4CA5F1
+            box-sizing: content-box
+            padding: .7rem 1.2rem
+            color: white
+            border-radius: 5px
+            border: none
+
+        .ok_button
+            background: #4CA5F1
+
+
+// invite pop up
+.invite_popup
+    width: 40vw
+    margin-left: 16vw
+    padding: 0
+    height: fit-content
+    border-radius: 0
+    box-sizing: border-box
+
+    .invite_container
+        width: 100%
+        margin: 0
+        padding: 1.2rem 
+        display: flex!important
+        flex-direction: column
+        align-items: flex-start
+        justify-content: flex-start
+        font-size: 1rem
+        box-sizing: border-box
+        gap: .9rem
+
+        .header_bar
+            display: flex
+            flex-direction: column
+            width: 100%
+
+            .big_heading
+                display: flex
+                flex-direction: column
+                width: 100%
+                align-items: flex-start
+                font-size: 1.9rem
+                padding-top: .3rem
+                font-weight: 600
+                color: #4AA0D5
+
+            .lil_heading
+                font-size: .9rem
+                padding-top: .3rem
+
+            .close_container
+                width: 100%
+                height: fit-content
+                display: flex
+                justify-content: flex-end
+
+                #close
+                    width: 1.2rem
+
+
+            .lil_heading
+                text-align: left
+
+        .email-input
+            width: 100%
+            padding: 1rem
+            border: 1px solid rgba(155, 154, 154, 0.2)
+            outline: 0
+            box-sizing: border-box
+            font-size: .9rem
+            height: 3rem
+            background: #ffffff
+            color: grey
+
+        .email-input:focus, textarea:focus
+            outline: none
+            box-shadow: none
+
+        button
+            width: 100%
+            border-radius: 0
+            height: 3.2rem
+            background: #4AA0D5
+            margin-bottom: .4rem
+            border: none
+
+        button:hover
+            background: #4aa0d5e8
+
+        .confirm_buttons
+            display: flex
+            flex-direction: row
+            justify-content: space-between
+            width: 100%
+            padding: 2rem 0 0
+
+            button
+                width: fit-content
+                height: fit-content
+                padding: .7rem 1.2rem

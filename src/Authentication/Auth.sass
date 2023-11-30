@@ -1,0 +1,327 @@
+.auth, .main_Auth
+    width: 100vw
+    display: flex
+    flex-direction: row
+    height: 100vh
+    box-sizing: border-box
+
+.nav
+    width: 100%
+
+.auth_background, .auth_content
+    width: 55vw
+
+.auth_background
+    width: 45vw
+    background-image: url(../assets/pic.svg)
+    background-repeat: no-repeat
+    background-size: cover
+
+.auth_section, .sub_auth
+    width: 100%
+    box-sizing: border-box
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: .5rem
+    height: 100%
+    justify-content: center
+
+    .page_header, form
+        display: flex
+        flex-direction: column
+        margin: 0
+        width: 90%
+
+.sub_auth, .auth_section
+    padding: 0 4rem
+    align-items: center
+    gap: .1rem
+
+.or_text
+    font-size: 1rem
+    font-weight: 600
+    width: 100%
+    text-align: center
+
+.page_header
+    color: #4aa0d5
+    font-size: 1.5rem
+
+.required
+    font-size: .9rem
+    color: #6d6b6b
+
+.form_option
+    font-size: .9rem
+    color: #4aa0d5
+    width: 100%
+    text-align: right
+    cursor: pointer
+
+    &:hover
+        text-decoration: underline
+
+.auth_option
+    width: 90%
+    font-size: .9rem
+    color: #6d6b6b
+    text-align: left
+
+    a
+        font-weight: 600
+        color: #4aa0d5 
+
+        &:hover
+            text-decoration: underline
+
+form
+    gap: 1rem
+    width: 90%!important
+
+    label
+        width: 100%
+        font-size: .9rem
+        color: #6d6b6b
+        display: flex
+        flex-direction: column
+        gap: .5rem
+
+    input, select
+        height: 3rem
+        background: initial
+        width: 100%
+        outline: none
+        border: 1px solid #9f9f9f
+        padding: .9rem
+        box-sizing: border-box
+        color: #6d6b6b
+
+    input:active
+        border: 1px solid #4aa0d5
+        background: inherit
+
+    input[type = submit]
+        background: #4aa0d5
+        border: none
+        border-radius: 3px
+        font-size: .9rem
+        font-weight: 600
+        color: #ffffff
+        cursor: pointer
+
+    input[type = submit]:hover
+        background: #52b0ea
+
+    .checkbox_wrapper
+        display: flex
+        align-items: center
+        cursor: pointer
+
+        input
+            width: 1rem
+            height: 1rem
+            background: white!important
+            border: 1px solid #9f9f9f
+
+    .checkbox_label
+        font-size: .9rem
+        color: #666
+        margin-left: 5px
+        display: flex
+        flex-direction: row
+
+        a
+            color: #0077cc
+            text-decoration: none
+
+            &:hover
+                text-decoration: underline
+
+.sub_form
+    display: flex
+    flex-direction: row
+    gap: 1rem
+
+// Auth Page
+.header_question
+    font-size: 1.3rem
+    margin: 0
+    width: 100%
+    font-weight: 600
+
+.question_text
+    font-size: .8rem
+    color: #000000a2
+    width: 100%
+
+.pick_user
+    display: flex
+    flex-direction: row
+    gap: 1rem
+    border: 1px solid #E4E4E4
+    padding: 2rem
+    justify-content: center
+    align-items: center
+    height: auto
+    width: 100%
+    cursor: pointer
+    color: black
+    align-items: center
+    transition: .13s
+    box-sizing: border-box
+
+.pick_user:hover
+    border: 1px solid #52b0ea
+    // scale: 1.04
+    background: #52b0ea0c
+
+.option_text
+    display: flex
+    flex-direction: column
+
+.select_user
+    display: flex
+    flex-direction: column
+    gap: 1.5rem
+    padding-top: 1rem
+    width: 100%
+
+.box_text
+    font-size: .8rem
+    color: #000000a2
+
+.user_icon
+    width: 2.8rem
+
+.lil_head
+    font-size: 1.1rem
+    margin: 0
+    width: 45%
+    font-weight: 600
+
+.add_section
+    display: flex
+    flex-direction: column
+    padding: 0 0 2rem
+
+    .add_title
+        font-weight: 600
+        font-size: 1.1rem
+
+    .add_note
+        font-size: .9rem
+
+    .add_frame
+        padding: 1rem 0 0
+
+        .add_button
+            width: fit-content
+            color: #4ca5f1
+            padding: 0 0 0 1rem
+            display: flex
+            flex-direction: row
+            align-items: center
+            cursor: pointer
+
+            img
+                width: 1.2rem
+
+        label
+            display: flex
+            flex-direction: row
+            width: 100%
+            font-size: .9rem
+            color: #000000a2
+            gap: .5rem
+            align-items: center
+
+        input
+            height: 3rem
+            background: initial
+            flex: 1
+            border: 1px solid #E4E4E4
+            outline: none
+            padding: .9rem
+            box-sizing: border-box
+            color: #000000a2
+
+
+        .budget_label
+            width: 100%
+            align-items: flex-start
+            flex-direction: column!important
+
+            input
+                width: 100%
+
+.added
+    display: flex
+    flex-direction: column
+    padding: 1rem 0
+
+    .added_title
+        font-size: .9rem
+        font-weight: 600
+
+    .added_tab
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        font-size: .8rem
+        color: #000000a2
+        padding: .3rem 1rem .4rem
+        width: 50%
+        text-transform: uppercase
+
+        img
+            width: 1.2rem
+            cursor: pointer
+
+.button_section
+    display: flex
+    align-items: center
+    justify-content: center
+    width: 100%
+
+    .save_button
+        background: #4ca5f1
+        padding: .5rem 1.5rem
+        font-size: 1rem
+        border-radius: 5px
+        color: white
+        font-weight: 600
+        width: fit-content
+        cursor: pointer
+
+.auth_content
+    overflow: hidden
+
+.auth_section
+    padding: 3rem 4rem 5rem
+    overflow: scroll
+
+.added_budget
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: .5rem
+    font-size: .9rem
+    
+
+:root
+    border-bottom: none
+    --toastify-color-error: #ffffff
+    --toastify-icon-color-error: #e74c3c
+    --toastify-z-index: 20000!important
+
+.Toastify__toast, .Toastify
+    z-index: 200000!important
+
+.auths_header
+    text-align: left
+    width: 100!important
+    padding-top: 5rem
+
+option
+    text-transform: capitalize
