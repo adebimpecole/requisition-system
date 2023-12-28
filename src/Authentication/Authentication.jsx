@@ -136,7 +136,7 @@ const Authentication = () => {
               Dedicate and approve your company's budget for whatever time
               period is required.
             </div>
-            <div class="add_frame">
+            <div className="add_frame">
               <label className="budget_label">
                 Yearly Budget
                 <input
@@ -147,7 +147,7 @@ const Authentication = () => {
                 />
               </label>
             </div>
-            <div class="add_frame">
+            <div className="add_frame">
               <label className="budget_label">
                 Monthly Budget
                 <input

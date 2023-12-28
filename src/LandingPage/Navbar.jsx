@@ -8,15 +8,10 @@ const Navbar = () => {
       <div className='left_nav'>
         Logo
       </div>
-      <div className='middle_nav'>
-        <ul>
-          <li>Features</li>
-          <li>How it Works</li>
-        </ul>
-      </div>
       <div className='right_nav'>
+        <span>Features</span>
         <Link to='/login' className='nav_login'>Log In</Link>
-        <Link to='/auth' className='nav_button'>Sign Up</Link>
+        <Link to='/auth' className='nav_button'>Get Started</Link>
       </div>
     </div>
   );

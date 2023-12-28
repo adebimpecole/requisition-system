@@ -42,7 +42,7 @@ const UserHome = ({firstname, lastname, mail, company, role, dept,}) => {
               <div className='info_card'>
                 <img src={wait} alt='home_icon' />
                 <div className='card_number'>3</div>
-                <div className='card_label'>Awaiting Approval</div>
+                <div className='card_label'>Awaiting Funding</div>
               </div>
             </div>
           </div>

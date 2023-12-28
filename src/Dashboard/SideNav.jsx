@@ -2,11 +2,13 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import "./Nav.sass";
-import { Context } from "../Utilities/Context";
 import "../Authentication/Auth.sass";
 
-import { signOut } from "firebase/auth";
+import { Context } from "../Utilities/Context";
 import { auth } from "../config/firebase";
+import { newRequest } from "../config/functions";
+
+import { signOut } from "firebase/auth";
 import {
   getFirestore,
   collection,
@@ -17,10 +19,6 @@ import {
   addDoc,
   getDoc,
 } from "firebase/firestore";
-import 'firebase/functions';
-import {firebase} from 'firebase/app';
-
-
 
 import { ToastContainer } from "react-toastify";
 import Toastify from "toastify-js";
@@ -129,7 +127,9 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
       }
     }
   };
+
   const [email, setEmail] = useState("");
+  const [approvers, setApprovers] = useState([]);
 
   // getting user input
   const catchInput = (e) => {
@@ -184,6 +184,36 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     Swal.close();
   };
 
+  useEffect(() => {
+    // console.log(company)
+    const approversCollectionRef = collection(db, "users");
+    const query8 = query(
+      approversCollectionRef,
+      where("company_name", "==", company)
+    );
+
+    getDocs(query8)
+      .then((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const userData = [];
+          querySnapshot.forEach((doc) => {
+            if (doc.data().role == "Approver")
+              userData.push(doc.data().userId);
+          });
+          setApprovers(userData)
+        } else {
+          console.log("No user data found for this company name.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting user data:", error);
+      });
+  }, [company]);
+
+  useEffect(() => {
+    console.log(approvers);
+  }, [approvers]);
+
   const SendReq = async () => {
     const customId = generateCustomId("REQ_", 5);
 
@@ -200,27 +230,32 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
       if (countImgRef.current > 0) {
         attachment = true;
       }
-      console.log(countImgRef.current);
+      try {
+        // Add the request to Firestore
+        const requestsCollectionRef = collection(db, "requests");
 
-      const functions = firebase.functions();
-      const triggerFunction = functions.httpsCallable('triggerApprovalRequest');
-      await triggerFunction({
-        user_id: id,
-        date: the_date,
-        title: titleRef.current,
-        description: descRef.current,
-        status: "pending",
-        requset_id: customId,
-        company: company,
-        department: dept,
-        is_attachment: attachment,
-      })
-        .then((result) => {
-          console.log("Success:", result);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
+        await addDoc(requestsCollectionRef, {
+          user_id: id,
+          date: the_date,
+          title: titleRef.current,
+          description: descRef.current,
+          status: "pending",
+          requset_id: customId,
+          company: company,
+          department: dept,
+          is_attachment: attachment,
+          approvers: approvers,
+          approvedBy: [],
         });
+      } catch (error) {
+        const errorCode = error.code;
+        const error_message = error.message;
+        console.error(errorCode, error_message);
+        // Handle registration errors
+      }
+
+      newRequest(customId, id)
+
       Swal.close();
       successMessage("Request submitted!");
 

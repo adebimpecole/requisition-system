@@ -92,6 +92,15 @@ const Signup = () => {
         company_name: urlcompanyName,
         department: dept,
       });
+
+      // const fcmToken = await admin.messaging().getToken(userRecord.uid);
+
+      // // Save the FCM token to the Firestore database
+      // await db.collection("users").doc(userId).set({
+      //   fcmToken: fcmToken,
+      // });
+      // console.log(fcmToken)
+
       setuser(firstName);
       setid(userId);
       console.log("passsed");
@@ -135,15 +144,11 @@ const Signup = () => {
               </label>
             </div>
             <label>
-            Company Name
-              <input
-                type="text"
-                value={urlcompanyName}
-                readOnly={true}
-              />
+              Company Name
+              <input type="text" value={urlcompanyName} readOnly={true} />
             </label>
             <label>
-            Email *
+              Email *
               <input
                 type="email"
                 value={email}
@@ -151,7 +156,7 @@ const Signup = () => {
               />
             </label>
             <label>
-            Password *
+              Password *
               <input
                 type="password"
                 value={password}
@@ -159,7 +164,7 @@ const Signup = () => {
               />
             </label>
             <label>
-                Department
+              Department
               <select
                 id="department"
                 name="department"

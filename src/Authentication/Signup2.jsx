@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
@@ -20,7 +20,7 @@ const Signup2 = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [connfirm_pass, setConfirm_pass] = useState("");
+  const [confirm_pass, setConfirm_pass] = useState("");
   const [companyName, setCompanyName] = useState("");
 
   const onSubmit = async (e) => {
@@ -28,7 +28,7 @@ const Signup2 = () => {
     if (email === "" || password === "") {
       errorMessage("Please fill in required fields");
     } else {
-      if (password == connfirm_pass) {
+      if (password == confirm_pass) {
         try {
           // Create a new user with email and password
           const userCredential = await createUserWithEmailAndPassword(
@@ -43,10 +43,20 @@ const Signup2 = () => {
           // Add the company name to Firestore
           const companiesCollectionRef = collection(db, "companies");
           await addDoc(companiesCollectionRef, {
-            name: companyName,
+            name: companyName.toLowerCase(),
             userId: userId,
-            role: "Admin",
+            role: "admin",
+            email: email,
+            password: password,
           });
+
+          // // Generate an FCM token for the user
+          // const fcmToken = await admin.messaging().getToken(userRecord.uid);
+
+          // // Save the FCM token to the Firestore database
+          // await db.collection("users").doc(userId).set({
+          //   fcmToken: fcmToken,
+          // });
 
           setuser(companyName);
           setid(userId);
@@ -108,17 +118,13 @@ const Signup2 = () => {
               Confirm Password *
               <input
                 type="password"
-                value={connfirm_pass}
+                value={confirm_pass}
                 onChange={(e) => setConfirm_pass(e.target.value)}
                 required
               />
             </label>
             <div className="checkbox_wrapper">
-              <input
-                type="checkbox"
-                id="terms"
-                name="terms"
-              />
+              <input type="checkbox" id="terms" name="terms" />
               <label htmlFor="terms" className="checkbox_label">
                 I agree to the{" "}
                 <a href="#" target="_blank" rel="noopener noreferrer">
@@ -127,18 +133,11 @@ const Signup2 = () => {
               </label>
             </div>
             <label>
-              <input
-                type="submit"
-                value="Sign up"
-                onClick={onSubmit}
-              />
+              <input type="submit" value="Sign up" onClick={onSubmit} />
             </label>
           </form>
-            <p className="auth_option">
-            Already have an account? {' '}
-            <NavLink to="/login">
-              Sign in
-            </NavLink>
+          <p className="auth_option">
+            Already have an account? <NavLink to="/login">Sign in</NavLink>
           </p>
         </div>
       </div>

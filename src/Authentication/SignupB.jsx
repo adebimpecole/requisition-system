@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
 import {
   getFirestore,
   collection,
   query,
   where,
+  addDoc,
   getDocs,
   doc,
-  addDoc,
-  getDoc,
+  updateDoc,
 } from "firebase/firestore";
+import {
+  auth,
+  messaging,
+  getFCMToken,
+  updateFCMToken,
+} from "../config/firebase"; // Ensure messaging and getFCMToken are exported correctly
 
 import Nav from "./Nav";
 import "./Auth.sass";
@@ -24,7 +28,8 @@ const SignupB = () => {
   const navigate = useNavigate();
   const db = getFirestore();
 
-  let { user, setuser, id, setid, errorMessage, setpage } = useContext(Context);
+  let { user, setuser, id, setid, errorMessage, setpage, setfcmToken } =
+    useContext(Context);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -34,6 +39,37 @@ const SignupB = () => {
   const [dept, setDept] = useState("");
 
   const [departments, setDepartments] = useState();
+
+  // Request permission and retrieve FCM token (assuming messaging is initialized correctly)
+  useEffect(() => {
+    // Check if messaging is available and permission can be requested
+    if (messaging && messaging.onTokenRefresh) {
+      try {
+        // Request permission for notifications
+        messaging
+          .getToken()
+          .then((currentToken) => {
+            if (currentToken) {
+              console.log("FCM token:", currentToken);
+            } else {
+              console.log(
+                "No Instance ID token available. Request permission to generate one."
+              );
+              return messaging.requestPermission();
+            }
+          })
+          .then(() => {
+            console.log("Notification permission granted.");
+            // Proceed with other actions after permission is granted
+          })
+          .catch((error) => {
+            console.log("Unable to get permission to notify.", error);
+          });
+      } catch (error) {
+        console.error("Error requesting permission:", error);
+      }
+    }
+  }, []);
 
   // Function to check if the company code is valid
 
@@ -79,14 +115,13 @@ const SignupB = () => {
           console.log(userData.name);
           isCompanyCodeValid = true;
         } else {
-          errorMessage("No user data found for this company ID.");
+          errorMessage("No user data found for this company code.");
           return false;
         }
       } catch (error) {
         console.error("Error checking company code:", error);
         isCompanyCodeValid = false; // Handle errors as needed
       }
-      console.log(the_companyName);
       if (isCompanyCodeValid) {
         try {
           // Create a new user with email and password
@@ -96,7 +131,6 @@ const SignupB = () => {
             password
           );
 
-          // Get the Firebase User ID (UID)
           const user = userCredential.user;
           const userId = user.uid;
           // Check if companyName is not empty
@@ -104,14 +138,46 @@ const SignupB = () => {
             // Add the user's registration data to Firestore
             const usersCollectionRef = collection(db, "users");
             await addDoc(usersCollectionRef, {
-              first_name: firstName, // Use the correct field names
-              last_name: lastName,
+              first_name: firstName.toLowerCase(), // Use the correct field names
+              last_name: lastName.toLowerCase(),
               email: email,
+              password: password,
               role: "requester",
               company_name: the_companyName, // This should be the resolved company name
-              department: dept,
+              department: dept.toLowerCase(),
               userId: userId,
             });
+            let the_token = await getFCMToken(userId);
+
+            // collects user fcm token
+            const collectedData = {
+              token: the_token,
+            };
+
+            const collectionRef = collection(db, "users");
+            const q = query(collectionRef, where("userId", "==", userId));
+
+            getDocs(q)
+              .then((querySnapshot) => {
+                querySnapshot.forEach((docSnap) => {
+                  // Found a document that matches the criteria
+                  const docRef = doc(db, "users", docSnap.id);
+
+                  // Update the document
+                  updateDoc(docRef, collectedData)
+                    .then(() => {
+                      console.log("Document updated successfully");
+                    })
+                    .catch((error) => {
+                      console.error("Error updating document:", error);
+                    });
+                });
+              })
+              .catch((error) => {
+                console.error("Error querying Firestore:", error);
+              });
+
+            setfcmToken(the_token);
             setuser(firstName);
             setid(userId);
             setpage("Home");
@@ -169,8 +235,6 @@ const SignupB = () => {
       }
     }
     fetchData();
-
-    console.log(departments);
   }, [companyCode]);
 
   return (
@@ -238,7 +302,7 @@ const SignupB = () => {
               >
                 {departments ? (
                   <>
-                  <option value="loading">-Select Department-</option>
+                    <option value="loading">-Select Department-</option>
                     {departments.map((the_dept, index) => (
                       <option value={the_dept} key={index}>
                         {the_dept}

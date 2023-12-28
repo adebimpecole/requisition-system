@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import axios from "axios";
+import { updateFCMToken, sendTokenToBackend } from './config/firebase';
 
 import './App.css'
 import HomePage from './LandingPage/HomePage';
@@ -9,6 +10,7 @@ import { Context } from './Utilities/Context';
 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchData } from './config/functions';
 
 const Login = lazy(() => import('./Authentication/Login2'));
 const Signup = lazy(() => import('./Authentication/Signup'));
@@ -41,7 +43,10 @@ function App() {
   let [view, setView] = useState("Profile")
   let [user, setuser] = useState(null)
   let [id, setid] = useState(null)
-  let providerValue = useMemo(() => ({ user, setuser, id, setid, errorMessage, successMessage, page, setpage, view, setView}), [user, setuser, id, setid, errorMessage, page, setpage, view, setView ])
+
+  let [fcmToken, setfcmToken] = useState(null)
+
+  let providerValue = useMemo(() => ({ user, setuser, id, setid, errorMessage, successMessage, page, setpage, view, setView, fcmToken, setfcmToken}), [user, setuser, id, setid, errorMessage, page, setpage, view, setView, fcmToken, setfcmToken ])
 
 
   // Save user to localStorage as a JSON string
@@ -52,17 +57,19 @@ function App() {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("id", JSON.stringify(id));
       localStorage.setItem("page", JSON.stringify(page));
-
+      localStorage.setItem("token", JSON.stringify(fcmToken));
     }
 
   }, [user]);
 
+  
   // Retrieve user from localStorage and parse it to an object
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedId = localStorage.getItem("id");
     const storedPage = localStorage.getItem("page");
-
+    const storedToken = localStorage.getItem("token");
+    
     if (storedUser) {
       setuser(JSON.parse(storedUser));
     }
@@ -72,8 +79,16 @@ function App() {
     if (storedPage) {
       setpage(JSON.parse(storedPage));
     }
-  }, []);
+    if (storedToken) {
+      setfcmToken(JSON.parse(storedToken));
+      if (storedToken === undefined) {
+        setfcmToken(null);
+      }
+    }
 
+    fetchData(id)
+  }, []);
+  
   return (
     <BrowserRouter>
       <>

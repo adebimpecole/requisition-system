@@ -40,16 +40,24 @@ const Admins = (props) => {
     useEffect(() => {
         setIsApproverLoading(true);
         const userCollectionRef = collection(db, 'users');
-        const query4 = query(userCollectionRef, where('company_name', '==', props.company), where('role', '==', "Approver"));
+        const query4 = query(userCollectionRef, where('company_name', '==', props.company));
 
         getDocs(query4)
             .then((querySnapshot) => {
                 if (!querySnapshot.empty) {
                     const userData = [];
+                    const approverData = [];
+
                     querySnapshot.forEach((doc) => {
-                        userData.push(doc.data());
+                        if(doc.data().role == "requester"){
+                            userData.push(doc.data());
+                        }
+                        else if(doc.data().role == "Approver"){
+                            approverData.push(doc.data());
+                        }
                     });
-                    setApproverData(userData);
+                    setApproverData(approverData);
+                    setData(userData)
                 } else {
                     console.log('No user data found for this company name.');
                 }
@@ -61,28 +69,7 @@ const Admins = (props) => {
                 setIsApproverLoading(false);
             });
 
-        setIsLoading(true);
-        const employeeCollectionRef = collection(db, 'users');
-        const query10 = query(employeeCollectionRef, where('company_name', '==', props.company));
-
-        getDocs(query10)
-            .then((querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    const userData = [];
-                    querySnapshot.forEach((doc) => {
-                        userData.push(doc.data());
-                    });
-                    setData(userData);
-                } else {
-                    console.log('No user data found for this company name.');
-                }
-            })
-            .catch((error) => {
-                console.error('Error getting user data:', error);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
+        setIsLoading(false);
     }, []);
 
     const columns = useMemo(() => COLUMNS, []);

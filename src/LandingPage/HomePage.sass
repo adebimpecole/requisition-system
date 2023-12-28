@@ -1,41 +1,99 @@
 .home_content
     display: flex
-    flex-direction: row
+    flex-direction: column
     width: 100%
     justify-content: space-between
     align-items: center
     padding: 0 3rem
     font-size: 1rem
-    height: 40rem
     box-sizing: border-box
+    height: 100vh
+    overflow: hidden
     
 .HomePage
     padding: 1rem 3rem
+    background-image: url(../assets/lines.png)
+    background-repeat: no-repeat
+    background-position: bottom
+    background-size: contain
+    background-color: #FCFDFF
+    height: 100vh
+    overflow: hidden
 
 
 .home_text
-    width: 40%
+    width: 70%
     display: flex
     flex-direction: column
+    align-items: center
+    margin-top: 8rem
     gap: 1rem
+    font-size: .9rem
 
 .nav_button
-    background: #372F68
-    color: initial
-    padding: .8rem 2rem
+    background: rgb(76, 165, 241)
+    color: white
+    padding: .6rem 1.3rem
     width: fit-content
-    border-radius: 7px
+    border-radius: 50px
     font-weight: 600
+    transition: .15s
+
+    &:hover
+        background: rgba(76, 164, 241, 0.802)
+        color: white
+
+.nav_button2
+    border: 1px solid #E4E4E4
+    color: black
+    padding: .6rem 1rem
+    width: 7.5rem
+    border-radius: 50px
+    font-weight: 600
+    background: #FCFDFF
+    text-align: center
+    transition: .15s
+
+    &:hover
+        border: 1px solid rgb(76, 165, 241)
+        background: #FCF#c3d4f4
+
+
+.hompeage_buttons
+    width: 100%
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: center
+    gap: 1rem
+    font-size: .95rem
 
 .home_image
-    width: 55%
+    width: 100%
+    overflow: hidden
+    display: flex
+    align-items: center
+    justify-content: center
 
 .the_image
-    width: 100%
+    width: 48rem
     height: auto
+    border: 1px solid #E4E4E4
+    border-radius: 10px
+    height: fit-content
+    position: relative
+    bottom: -1rem
+
+.home_sub_text
+    text-align: center
 
 h1
     margin: 0
 
 a
     text-decoration: none
+    color: black
+    transition: .15s
+
+    &:hover
+        color: rgb(76, 165, 241)

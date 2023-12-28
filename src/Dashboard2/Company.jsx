@@ -90,21 +90,34 @@ const Company = () => {
     const assignApprover = (e) => {
         const collectionRef = collection(db, 'users');
         const q = query(collectionRef, where('userId', '==', e.original.userId));
-
+        console.log(e)
         getDocs(q)
             .then((querySnapshot) => {
                 querySnapshot.forEach((docSnap) => {
                     const docRef = doc(db, 'users', docSnap.id);
-                    const update = { role: "Approver" }
+                    if(e.original.role == "Approver"){
+                        const update = { role: "Requester" }
+                        // Update the document
+                        updateDoc(docRef, update)
+                            .then(() => {
+                                console.log('Document updated successfully');
+                            })
+                            .catch((error) => {
+                                console.error('Error updating document:', error);
+                            });
+                    }
+                    else if(e.original.role == "Requester"){
+                        const update = { role: "Approver" }
+                        // Update the document
+                        updateDoc(docRef, update)
+                            .then(() => {
+                                console.log('Document updated successfully');
+                            })
+                            .catch((error) => {
+                                console.error('Error updating document:', error);
+                            });
+                    }
 
-                    // Update the document
-                    updateDoc(docRef, update)
-                        .then(() => {
-                            console.log('Document updated successfully');
-                        })
-                        .catch((error) => {
-                            console.error('Error updating document:', error);
-                        });
                 });
             })
             .catch((error) => {
@@ -115,28 +128,55 @@ const Company = () => {
     }
 
     const makeApprover = (e) => {
-        const swal = Swal.fire({
-            html:
-                "<div class='header_bar'>" +
-                "<span class='close_container'>" +
-                "<img id='close' src='" + iclose + "' alt='alert_icon' style='cursor:pointer'/>" +
-                "</span>" +
-                "<span class='big_heading'>" +
-                "Add Approver" +
-                "</span>" +
-                "<span class='lil_heading'>Are you absolutely sure you want to add " + e.values.name + " as an approver?</span>" +
-                "</div>" +
-                "<div class='confirm_buttons'>" +
-                "<button id='cancel-button' class='cancel_button'>Cancel</button>" +
-                "<button id='assign-button' class='button'>Yes</button>" +
-                "</div>",
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            customClass: {
-                popup: 'invite_popup',
-                htmlContainer: 'invite_container',
-            },
-        });
+        console.log(e)
+        if(e.original.role == "Approver"){
+            const swal = Swal.fire({
+                html:
+                    "<div class='header_bar'>" +
+                    "<span class='close_container'>" +
+                    "<img id='close' src='" + iclose + "' alt='alert_icon' style='cursor:pointer'/>" +
+                    "</span>" +
+                    "<span class='big_heading'>" +
+                    "Remove Approver" +
+                    "</span>" +
+                    "<span class='lil_heading'>Are you absolutely sure you want to remove " + e.values.name + " as an approver?</span>" +
+                    "</div>" +
+                    "<div class='confirm_buttons'>" +
+                    "<button id='cancel-button' class='cancel_button'>Cancel</button>" +
+                    "<button id='assign-button' class='button'>Yes</button>" +
+                    "</div>",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'invite_popup',
+                    htmlContainer: 'invite_container',
+                },
+            });
+        }
+        else if(e.original.role == "Requester"){
+            const swal = Swal.fire({
+                html:
+                    "<div class='header_bar'>" +
+                    "<span class='close_container'>" +
+                    "<img id='close' src='" + iclose + "' alt='alert_icon' style='cursor:pointer'/>" +
+                    "</span>" +
+                    "<span class='big_heading'>" +
+                    "Add Approver" +
+                    "</span>" +
+                    "<span class='lil_heading'>Are you absolutely sure you want to add " + e.values.name + " as an approver?</span>" +
+                    "</div>" +
+                    "<div class='confirm_buttons'>" +
+                    "<button id='cancel-button' class='cancel_button'>Cancel</button>" +
+                    "<button id='assign-button' class='button'>Yes</button>" +
+                    "</div>",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'invite_popup',
+                    htmlContainer: 'invite_container',
+                },
+            });
+        }
 
         // Close request
         const closeButton = document.getElementById('close');
@@ -149,10 +189,6 @@ const Company = () => {
         // Assign approver
         const assignButton = document.getElementById('assign-button');
         assignButton.addEventListener('click', () => assignApprover(e));
-    }
-
-    const removeApprover = (e) => {
-        console.log("make approver", e)
     }
 
     const columns = useMemo(() => COLUMNS, []);
@@ -168,14 +204,19 @@ const Company = () => {
     const switchTable = (e) => {
         setIsLoading(true);
         const approversCollectionRef = collection(db, 'users');
-        const approversQuery = query(approversCollectionRef, where('company_name', '==', user), where('role', '==', e));
-
+        const approversQuery = query(approversCollectionRef, where('company_name', '==', user));
+        console.log(e)
         getDocs(approversQuery)
             .then((querySnapshot) => {
                 if (!querySnapshot.empty) {
                     const approversUserData = [];
                     querySnapshot.forEach((doc) => {
-                        approversUserData.push(doc.data());
+                        if(e == "Approver" && doc.data().role == "Approver"){
+                            approversUserData.push(doc.data());
+                        }
+                        if(e == "Requester" && doc.data().role == "requester"){
+                            approversUserData.push(doc.data());
+                        }
                     });
                     approversUserData.forEach((element, index) => {
                         approversUserData[index].name = `${approversUserData[index].first_name} ${approversUserData[index].last_name}`
@@ -205,7 +246,7 @@ const Company = () => {
                 <div className='table_filters'>
                     <span onClick={()=>getUsers("All")}> All</span>
                     <span onClick={()=>switchTable("Approver")}> Approvers</span>
-                    <span onClick={()=>switchTable("requester")}> Requesters</span>
+                    <span onClick={()=>switchTable("Requester")}> Requesters</span>
                 </div>
                 {isLoading ? (
                     <p>Loading employees data...</p>
