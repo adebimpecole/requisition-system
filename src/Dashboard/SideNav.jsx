@@ -4,9 +4,17 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "./Nav.sass";
 import "../Authentication/Auth.sass";
 
+import { generateCustomId, todaysDate } from "../config/functions";
+
 import { Context } from "../Utilities/Context";
 import { auth } from "../config/firebase";
 import { newRequest } from "../config/functions";
+import {
+  addToFirestore,
+  fetchDataFromFirestore,
+  updateArrayFirestore,
+  uploadImage,
+} from "../config/firebaseFunctions";
 
 import { signOut } from "firebase/auth";
 import {
@@ -18,6 +26,8 @@ import {
   doc,
   addDoc,
   getDoc,
+  arrayUnion,
+  updateDoc,
 } from "firebase/firestore";
 
 import { ToastContainer } from "react-toastify";
@@ -50,7 +60,6 @@ import people2 from "../assets/people copy.svg";
 
 const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
   const db = getFirestore();
-
   // getting the values stored in the usecontext hook
   const {
     user,
@@ -74,8 +83,6 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
   const compDocRef = collection(db, "companies");
 
   const query4 = query(userDocRef, where("userId", "==", id));
-
-  useEffect(() => {}, [id]);
 
   useEffect(() => emailjs.init("SSs84it7yCrmBJnMt"), []);
 
@@ -128,8 +135,7 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     }
   };
 
-  const [email, setEmail] = useState("");
-  const [approvers, setApprovers] = useState([]);
+  const [image, setImage] = useState(null);
 
   // getting user input
   const catchInput = (e) => {
@@ -147,6 +153,9 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
   const Attachment = (the_div, the_input) => {
     var childElement = document.createElement("div");
 
+    const file = the_input.files[0];
+    console.log("File object:", file);
+
     var img = new Image(); //adding delete button
     img.src = `${iclose}`;
     img.onclick = function () {
@@ -158,85 +167,52 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     var fileName = the_input.value.split("\\").pop(); // Extract just the file name
     childElement.innerHTML = `${fileName}`;
 
+    // setImage(file);
+    console.log(the_input.files);
+
     countImgRef.current = countImgRef.current + 1;
 
     childElement.appendChild(img);
     the_div.appendChild(childElement);
   };
 
-  // function that generates custom id for requests
-  function generateCustomId(prefix, length) {
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const charactersLength = characters.length;
-    let customId = prefix;
-
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charactersLength);
-      customId += characters.charAt(randomIndex);
-    }
-
-    return customId;
-  }
+  const handleFileChange = (event) => {
+    console.log(event)
+    const file = event.target.files[0];
+    setImage(file);
+  };
 
   // handles request actions
   const DeleteReq = () => {
     Swal.close();
   };
 
-  useEffect(() => {
-    // console.log(company)
-    const approversCollectionRef = collection(db, "users");
-    const query8 = query(
-      approversCollectionRef,
-      where("company_name", "==", company)
-    );
-
-    getDocs(query8)
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          const userData = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.data().role == "Approver")
-              userData.push(doc.data().userId);
-          });
-          setApprovers(userData)
-        } else {
-          console.log("No user data found for this company name.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error getting user data:", error);
-      });
-  }, [company]);
-
-  useEffect(() => {
-    console.log(approvers);
-  }, [approvers]);
-
-  const SendReq = async () => {
-    const customId = generateCustomId("REQ_", 5);
-
+  const SendReq = async (customId) => {
     if (titleRef.current == "" || descRef.current == "") {
       errorMessage("Cannot submit empty request");
     } else {
-      const today = new Date();
-      const month = today.getMonth() + 1;
-      const year = today.getFullYear();
-      const date = today.getDate();
-      const the_date = `${month}/${date}/${year}`;
-
+      let todays_date = todaysDate();
       let attachment = false;
+
+      let image_url = "";
+
       if (countImgRef.current > 0) {
         attachment = true;
+        // upload image to firestore if an image was selected and get the url
+        image_url = await uploadImage(image, "request", id, customId);
       }
       try {
-        // Add the request to Firestore
-        const requestsCollectionRef = collection(db, "requests");
+        let companyData = await fetchDataFromFirestore(
+          "companies",
+          "name",
+          company
+        );
 
-        await addDoc(requestsCollectionRef, {
+        console.log(image_url);
+
+        const requestData = {
           user_id: id,
-          date: the_date,
+          date: todays_date,
           title: titleRef.current,
           description: descRef.current,
           status: "pending",
@@ -244,20 +220,44 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
           company: company,
           department: dept,
           is_attachment: attachment,
-          approvers: approvers,
+          approvalIndex: 0,
+          approvers: companyData.approvers,
           approvedBy: [],
-        });
+          is_link: false,
+          image_url: image_url,
+        };
+
+        await addToFirestore("requests", requestData);
+
+        // notification
+        let notificationId = generateCustomId("NOT_", 5);
+        const messageToAdd = {
+          message: "New Request for Approval",
+          body: {
+            reqId: customId,
+            userId: id,
+          },
+          notificationId: notificationId,
+          type: "request",
+          status: "pending",
+        };
+
+        // send request notification to the first approver on the list
+        updateArrayFirestore(
+          "users",
+          "email",
+          companyData.approvers[0],
+          "messages",
+          messageToAdd
+        );
+        successMessage("Request submitted!");
       } catch (error) {
-        const errorCode = error.code;
-        const error_message = error.message;
-        console.error(errorCode, error_message);
-        // Handle registration errors
+        console.error("Error querying Firestore:", error);
       }
 
-      newRequest(customId, id)
+      // newRequest(customId, id);
 
       Swal.close();
-      successMessage("Request submitted!");
 
       titleRef.current = "";
       descRef.current = "";
@@ -266,85 +266,132 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
   };
 
   const NewRequest = async () => {
-    const swal = Swal.fire({
-      html:
-        "<div class='title_bar'>" +
-        "New Request: #1234 - Cole Mary" +
-        "<img id='close' src='" +
-        iclose +
-        "' alt='alert_icon' style='cursor:pointer'/>" +
-        "</div>" +
-        '<input id="swal-input1" class="swal2-input" type="text" value="" autocomplete="off">' +
-        '<textarea id="swal-input2" class="swal2-input" value="" autocomplete="off"></textarea>' +
-        '<div id="attach_div" class="swal3-input"></div>' +
-        "<span class='last_div'>" +
-        "<span class='left_icons'>" +
-        `<button id='custom-button' class='button'>Send</button>` +
-        "<div id='attachment' class='fileinputs' >" +
-        "<input type='file' class='file' id='file_field'/>" +
-        "<div  class='fakefile'>" +
-        "<img src='" +
-        iattach +
-        "' alt='alert_icon' style='cursor:pointer'/>" +
-        "</div>" +
-        "</div>" +
-        "<img src='" +
-        ilink +
-        "' alt='alert_icon' style='cursor:pointer'/>" +
-        "<div id='image_input' class='fileinputs' >" +
-        "<input type='file' class='file' accept='image/*' id='image_field'/>" +
-        "<div  class='fakefile'>" +
-        "<img src='" +
-        iphoto +
-        "' alt='alert_icon' style='cursor:pointer'/>" +
-        "</div>" +
-        "</div>" +
-        "</span>" +
-        "<img id='delete_request' src='" +
-        itrash +
-        "' style='cursor:pointer' alt='alert_icon'/>" +
-        "</span>",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      customClass: {
-        popup: "popup",
-        htmlContainer: "container",
-      },
+    let companyId;
+
+    const collection2Ref = collection(db, "companies");
+
+    const q2 = query(collection2Ref, where("name", "==", company));
+
+    const querySnapshot = await getDocs(q2);
+
+    querySnapshot.forEach(async (doc) => {
+      try {
+        const companyDoc = await getDoc(doc.ref);
+
+        if (companyDoc.exists()) {
+          // Assuming emails are stored in a field called 'approvers' in the company document
+          const emailsToCheck = companyDoc.data().approvers;
+
+          // Assuming the users collection is called "users"
+          const userCollectionRef = collection(db, "users");
+
+          // Query users where the email is in the provided list
+          const queryByEmails = query(
+            userCollectionRef,
+            where("email", "in", emailsToCheck)
+          );
+
+          const querySnapshot = await getDocs(queryByEmails);
+
+          const foundEmails = querySnapshot.docs.map(
+            (userDoc) => userDoc.data().email
+          );
+
+          // Check if all emails are found in the users collection
+          const missingEmails = emailsToCheck.filter(
+            (email) => !foundEmails.includes(email)
+          );
+
+          if (missingEmails.length > 0) {
+            errorMessage("Approver Signup Required!");
+          } else {
+            let customId = generateCustomId("REQ_", 5);
+
+            const the_html = ` 
+            <div class='title_bar'> 
+              New Request: 
+              ${customId} - ${firstname} ${lastname} 
+              <img id='close' src= ${iclose} alt='alert_icon' style='cursor:pointer'/> 
+            </div> 
+            <input id="swal-input1" class="swal2-input" type="text" value="" autocomplete="off">
+            <textarea id="swal-input2" class="swal2-input" value="" autocomplete="off"></textarea>
+            <div id="attach_div" class="swal3-input"></div>
+            <span class='last_div'>
+              <span class='left_icons'>
+                <button id='custom-button' class='button'>Send</button>
+                <div id='attachment' class='fileinputs' >
+                  <input type='file' class='file' id='file_field'/>
+                  <div id='file_input'  class='fakefile'>
+                    <img src= ${iattach} alt='alert_icon' style='cursor:pointer'/>
+                  </div>
+                </div>
+                <div id='image_input' class='fileinputs' >
+                  <input type='file' class='file' accept='image/*' id='our_image'/>
+                  <div  class='fakefile'>
+                    <img src= ${iphoto} alt='alert_icon' style='cursor:pointer'/>
+                  </div>
+                </div>
+              </span>
+              <img id='delete_request' src= ${itrash} style='cursor:pointer' alt='alert_icon'/>
+            </span>`;
+
+            const swal = Swal.fire({
+              html: the_html,
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              customClass: {
+                popup: "request_popup",
+                htmlContainer: "container",
+              },
+            });
+            // collect title
+            const firstInput = document.getElementById("swal-input1");
+            const inputListener = () => catchInput(firstInput.value);
+            firstInput.addEventListener("input", inputListener);
+
+            // collect description
+            const secInput = document.getElementById("swal-input2");
+            const input2Listener = () => catchDesc(secInput.value);
+            secInput.addEventListener("input", input2Listener);
+
+            // Import file
+            const file_itself = document.getElementById("file_field");
+            const fileDiv = document.getElementById("attach_div");
+            file_itself.addEventListener("input", () =>
+              Attachment(fileDiv, file_itself)
+            );
+
+            // Import image
+            const image_itself = document.getElementById("our_image");
+            image_itself.addEventListener("input", () =>
+              Attachment(fileDiv, image_itself)
+            );
+
+            // Delete request
+            const trashButton = document.getElementById("delete_request");
+            trashButton.addEventListener("click", () => DeleteReq());
+
+            // Close request
+            const closeButton = document.getElementById("close");
+            closeButton.addEventListener("click", () => DeleteReq());
+
+            // submit request
+            const customButton = document.getElementById("custom-button");
+            customButton.addEventListener("click", () => SendReq(customId));
+
+            // Import image
+            const our_image_itself = document.getElementById("our_image");
+            our_image_itself.addEventListener("change", handleFileChange);
+          }
+        } else {
+          console.error(
+            `Error: Company document with ID ${companyId} not found.`
+          );
+        }
+      } catch (error) {
+        console.error("Error checking emails:", error);
+      }
     });
-    // collect title
-    const firstInput = document.getElementById("swal-input1");
-    const inputListener = () => catchInput(firstInput.value);
-    firstInput.addEventListener("input", inputListener);
-
-    // collect description
-    const secInput = document.getElementById("swal-input2");
-    const input2Listener = () => catchDesc(secInput.value);
-    secInput.addEventListener("input", input2Listener);
-
-    // Import file
-    const file_itself = document.getElementById("file_field");
-    const fileDiv = document.getElementById("attach_div");
-    file_itself.addEventListener("input", () =>
-      Attachment(fileDiv, file_itself)
-    );
-
-    // Import image
-    const image_itself = document.getElementById("image_field");
-    image_itself.addEventListener("input", () =>
-      Attachment(fileDiv, image_itself)
-    );
-
-    // Delete request
-    const trashButton = document.getElementById("delete_request");
-    trashButton.addEventListener("click", () => DeleteReq());
-
-    // Close request
-    const closeButton = document.getElementById("close");
-    closeButton.addEventListener("click", () => DeleteReq());
-
-    // submit request
-    const customButton = document.getElementById("custom-button");
-    customButton.addEventListener("click", () => SendReq());
   };
 
   // invite user container
@@ -388,12 +435,11 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
 
   // Signing out
   const handleLogout = () => {
-    console.log("clicked");
     signOut(auth)
       .then(() => {
         // Sign-out successful.
         window.location.href = "*";
-        console.log("Signed out successfully");
+        localStorage.clear();
       })
       .catch((error) => {
         console.log(error);
@@ -402,66 +448,84 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
   return (
     <div className="SideNav">
       <ul>
-        <div onClick={handleLogout}>Logo</div>
-        <div className="list_segment">
-          <li
-            onClick={() => setpage("Home")}
-            className={`${page === "Home" ? "opened_tab" : ""}`}
-          >
-            {page === "Home" ? (
-              <img src={home2} alt="nav_icon" className="nav_icon" />
-            ) : (
-              <img src={home} alt="nav_icon" className="nav_icon" />
-            )}
-            <span>Home</span>
-          </li>
-          <li onClick={() => setpage("Home")}>
-            <img src={chart} alt="nav_icon" className="nav_icon" />
-            <span>Analytics</span>
-          </li>
-          <li
-            onClick={() => setpage("Records")}
-            className={`${page === "Records" ? "opened_tab" : ""}`}
-          >
-            {page === "Records" ? (
-              <img src={list2} alt="nav_icon" className="nav_icon" />
-            ) : (
-              <img src={list} alt="nav_icon" className="nav_icon" />
-            )}
-            <span>Records</span>
-          </li>
-          <li
-            onClick={() => setpage("Teams")}
-            className={`${page === "Teams" ? "opened_tab" : ""}`}
-          >
-            {page === "Teams" ? (
-              <img src={people2} alt="nav_icon" className="nav_icon" />
-            ) : (
-              <img src={people} alt="nav_icon" className="nav_icon" />
-            )}
-            <span>Team</span>
-          </li>
-          <li
-            onClick={() => setpage("Requests")}
-            className={`${page === "Requests" ? "opened_tab" : ""}`}
-          >
-            {page === "Requests" ? (
-              <img src={list2} alt="nav_icon" className="nav_icon" />
-            ) : (
-              <img src={list} alt="nav_icon" className="nav_icon" />
-            )}
-            <span>Requests</span>
-          </li>
+        <div onClick={handleLogout} className="sidenav_logo">
+          Requisitor
         </div>
-        <div className="list_segment">
-          <li className="new" onClick={NewRequest}>
-            <img src={request} alt="nav_icon" className="nav_icon" />
-            <span>New Request</span>
-          </li>
-          <li onClick={InviteUser}>
-            <img src={newuser} alt="nav_icon" className="nav_icon" />
-            <span>Invite User</span>
-          </li>
+        <div className="nav_section">
+          <div className="list_segment">
+            <li
+              onClick={() => setpage("Home")}
+              className={`${page === "Home" ? "opened_tab" : ""}`}
+            >
+              {page === "Home" ? (
+                <img src={home2} alt="nav_icon" className="nav_icon" />
+              ) : (
+                <img src={home} alt="nav_icon" className="nav_icon" />
+              )}
+              <span>Home</span>
+            </li>
+            {role == "requester" ? (
+              <span></span>
+            ) : (
+              <>
+                <li
+                  onClick={() => setpage("Analytics")}
+                  className={`${page === "Analytics" ? "opened_tab" : ""}`}
+                >
+                  {page === "Analytics" ? (
+                    <img src={home2} alt="nav_icon" className="nav_icon" />
+                  ) : (
+                    <img src={chart} alt="nav_icon" className="nav_icon" />
+                  )}
+                  <span>Analytics</span>
+                </li>
+                <li
+                  onClick={() => setpage("Records")}
+                  className={`${page === "Records" ? "opened_tab" : ""}`}
+                >
+                  {page === "Records" ? (
+                    <img src={list2} alt="nav_icon" className="nav_icon" />
+                  ) : (
+                    <img src={list} alt="nav_icon" className="nav_icon" />
+                  )}
+                  <span>Records</span>
+                </li>
+              </>
+            )}
+            <li
+              onClick={() => setpage("Teams")}
+              className={`${page === "Teams" ? "opened_tab" : ""}`}
+            >
+              {page === "Teams" ? (
+                <img src={people2} alt="nav_icon" className="nav_icon" />
+              ) : (
+                <img src={people} alt="nav_icon" className="nav_icon" />
+              )}
+              <span>Team</span>
+            </li>
+            <li
+              onClick={() => setpage("Requests")}
+              className={`${page === "Requests" ? "opened_tab" : ""}`}
+            >
+              {page === "Requests" ? (
+                <img src={list2} alt="nav_icon" className="nav_icon" />
+              ) : (
+                <img src={list} alt="nav_icon" className="nav_icon" />
+              )}
+              <span>Requests</span>
+            </li>
+          </div>
+          <div className="list_segment">
+            <span className="section_title">Actions</span>
+            <li className="" id="first_one" onClick={NewRequest}>
+              <img src={request} alt="nav_icon" className="nav_icon" />
+              <span>New Request</span>
+            </li>
+            <li onClick={InviteUser}>
+              <img src={newuser} alt="nav_icon" className="nav_icon" />
+              <span>Invite User</span>
+            </li>
+          </div>
         </div>
       </ul>
       <ul>

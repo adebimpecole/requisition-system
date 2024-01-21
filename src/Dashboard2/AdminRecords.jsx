@@ -220,7 +220,7 @@ const AdminRecords = () => {
                     <div className='welcome_text'>Department</div>
                 </div>
 
-                <div className='table'>
+                <div className='the_table'>
                     <div className='table_filters'>
                         <span> All</span>
                         <Select

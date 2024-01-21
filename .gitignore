@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+config.js
+firestore.rules
+key.perm
+cert.perm
+firebase.js
+firebase-messaging-sw.js
+requisition-system-firebase-adminsdk-do62v-6654b41437.json
+server.cjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

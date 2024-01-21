@@ -63,7 +63,7 @@ export default function Table() {
                     });
                     setData(userData);
                 } else {
-                    console.log('No user data found for this company name.');
+                    console.log('No user data found for this id.');
                 }
             })
             .catch((error) => {
@@ -91,11 +91,11 @@ export default function Table() {
         const swal = Swal.fire({
             html:
                 "<div class='the_title'>" +
-                e.values.title +
+                "<span> " + e.values.title + "</span>" +
                 "<img id='close' src='" + iclose + "' alt='alert_icon' style='cursor:pointer'/>" +
                 "</div>" +
                 '<div class="to_who">' +
-                'To - Mary' +
+                'REQUEST ID - ' + e.values.requset_id +
                 '</div>' +
                 '<div class="the_description" >' +
                 e.values.description +
@@ -119,7 +119,7 @@ export default function Table() {
         closeButton.addEventListener('click', () => CloseReq());
     }
     return (
-        <div className="table">
+        <div className="the_table">
             <div className='table_name'>Recent Requests <span onClick={() => setpage("Requests")}>View All</span></div>
             {isLoading ? (
                 <p>Loading data...</p>

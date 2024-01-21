@@ -26,23 +26,23 @@ const UserHome = ({firstname, lastname, mail, company, role, dept,}) => {
             <div className='home_info'>
               <div className='info_card'>
                 <img src={pend} alt='home_icon' />
-                <div className='card_number'>3</div>
+                <div className='card_number'>0</div>
                 <div className='card_label'>Pending requests</div>
               </div>
               <div className='info_card'>
                 <img src={approve} alt='home_icon' />
-                <div className='card_number'>31</div>
-                <div className='card_label'>Approved requests</div>
+                <div className='card_number'>0</div>
+                <div className='card_label'>Completed requests</div>
               </div>
               <div className='info_card'>
                 <img src={decline} alt='home_icon' />
-                <div className='card_number'>13</div>
+                <div className='card_number'>0</div>
                 <div className='card_label'>Rejected requests</div>
               </div>
               <div className='info_card'>
                 <img src={wait} alt='home_icon' />
-                <div className='card_number'>3</div>
-                <div className='card_label'>Awaiting Funding</div>
+                <div className='card_number'>0</div>
+                <div className='card_label'>Total Requests</div>
               </div>
             </div>
           </div>

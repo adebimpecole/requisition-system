@@ -157,7 +157,7 @@ const Requests = ({ firstname, lastname, mail, company, role, dept }) => {
                     </div>
                     <div className='welcome_text'>{dept} Department</div>
                 </div>
-                <div className='table'>
+                <div className='the_table'>
                     <div className='table_filters'>
                         <span> All</span>
                         <span>Approved</span>

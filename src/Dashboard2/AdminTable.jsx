@@ -119,7 +119,7 @@ const AdminTable = () => {
       closeButton.addEventListener('click', () => CloseReq());
     }
   return (
-        <div className="table">
+        <div className="the_table">
             <div className='table_name'>Recent Requests <span>View All</span></div>
             {isLoading ? (
                 <p>Loading data...</p>

@@ -33,7 +33,7 @@ const AdminSideNav = () => {
     const db = getFirestore();
 
     // getting the values dtored in the usecontext hook
-    const { user, setuser, id, setid, errorMessage, successMessage, setpage, page } = useContext(Context);
+    const { user, setuser, id, setid, errorMessage, successMessage, setpage, page, role } = useContext(Context);
 
     const emailRef = useRef('');
     const the_companyRef = useRef('');
@@ -45,9 +45,11 @@ const AdminSideNav = () => {
     const query4 = query(userDocRef, where("userId", "==", id));
 
     useEffect(() => {
-    }, [id])
-
-    useEffect(() => emailjs.init('SSs84it7yCrmBJnMt'), []);
+        if(role=="admin"){
+            setpage("Dashboard")
+            emailjs.init('SSs84it7yCrmBJnMt')
+        }
+    }, [])
 
     const onSubmit = async () => {
         // const the_role = document.querySelector('input[name="role"]:checked').value;

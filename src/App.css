@@ -9,6 +9,10 @@
   flex: 1;
 }
 
+.Toastify__toast-container--top-center{
+  top: 5em!important;
+}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

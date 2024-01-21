@@ -21,6 +21,8 @@ import { Context } from "../Utilities/Context";
 
 import { ToastContainer } from "react-toastify";
 
+// import { getAndDeletePendingMessages } from '../config/pendingMessages';
+
 const Login2 = () => {
   let {
     user,
@@ -31,6 +33,7 @@ const Login2 = () => {
     setpage,
     fcmToken,
     setfcmToken,
+    setrole,
   } = useContext(Context);
 
   const navigate = useNavigate();
@@ -41,6 +44,7 @@ const Login2 = () => {
 
   const onLogin = (e) => {
     e.preventDefault();
+    
 
     if (email === "" || password === "") {
       errorMessage("Please fill in required fields");
@@ -66,6 +70,8 @@ const Login2 = () => {
 
                 setuser(userData.first_name);
                 setid(userData.userId);
+                setrole(userData.role);
+
                 setfcmToken(userData.token);
 
                 setpage("Home");
@@ -114,6 +120,28 @@ const Login2 = () => {
                   .catch((error) => console.error("Error:", error));
 
                 sendTokenToBackend(id, fcmToken);
+
+                const socket = new WebSocket(`ws://localhost:8080/${id}`);
+
+                socket.onopen = () => {
+                  console.log("WebSocket connection established");
+            
+                  // Send a message once the connection is open
+                  socket.send("Hello Server!");
+                };
+            
+                socket.onmessage = (event) => {
+                  console.log(`Received message: ${event.data}`);
+                };
+            
+                socket.onclose = () => {
+                  console.log("WebSocket connection closed");
+                };
+            
+                socket.onerror = (error) => {
+                  console.error("WebSocket error:", error);
+                };                
+
               } else {
                 // If no data is found in the 'users' collection, check the 'companies' collection
                 getDocs(query2)
@@ -124,6 +152,8 @@ const Login2 = () => {
                       const companyData = docSnapshot2.data();
                       setuser(companyData.name);
                       setid(companyData.userId);
+                      setrole(companyData.role);
+
                       setpage("Dashboard");
                       navigate("/admindash");
                     } else {
@@ -190,7 +220,7 @@ const Login2 = () => {
           </form>
 
           <p className="auth_option">
-            No account yet? <NavLink to="/signup2">Sign up</NavLink>
+            No account yet? <NavLink to="/auth">Sign up</NavLink>
           </p>
         </div>
         <ToastContainer />

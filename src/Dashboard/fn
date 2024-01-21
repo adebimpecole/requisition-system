@@ -1,0 +1,236 @@
+const SendRequest = async (e, N_Id, u_ID, c_ID) => {
+    const requestCollectionRef = collection(db, "requests");
+    const query4 = query(requestCollectionRef, where("requset_id", "==", e));
+
+    let requestData = await fetchDataFromFirestore(
+      "requests",
+      "requset_id",
+      e
+    );
+    try {
+      const querySnapshot2 = await getDocs(query4);
+      querySnapshot2.forEach(async (doc) => {
+        const currentValue = doc.data().approvalIndex;
+
+        const messageToAdd = {
+          note: replyRef.current,
+          email: mail,
+          response: the_response.current,
+          url: image
+            ? image
+            : "",
+        };
+
+        try {
+          const docRef = doc.ref;
+          // update the approval indes and adds approver response
+          if (fundRef.current == "") {
+            await updateDoc(docRef, {
+              approvedBy: arrayUnion(messageToAdd),
+              approvalIndex: currentValue + 1,
+            });
+          } else {
+            await updateDoc(docRef, {
+              approvedBy: arrayUnion(messageToAdd),
+              approvalIndex: currentValue + 1,
+              fund: fundRef.current,
+            });
+
+            // get the user department to send with the expense
+            const collection3Ref = collection(db, "users");
+            const query3 = query(collection3Ref, where("userId", "==", u_ID));
+
+            getDocs(query3)
+              .then(async (querySnapshot) => {
+                if (!querySnapshot.empty) {
+                  // Retrieve the first document that matches the query
+                  const docSnapshot = querySnapshot.docs[0];
+                  const userData = docSnapshot.data();
+
+                  const dept = userData.department;
+
+                  let expenseId = generateCustomId("EXP", 5);
+
+                  // add expenses to firestore
+                  const expensesCollectionRef = collection(db, "expenses");
+                  await addDoc(expensesCollectionRef, {
+                    requestId: e,
+                    amount: fundRef.current,
+                    purpose: purposeRef.current,
+                    expenseId: expenseId,
+                    companyId: c_ID,
+                    department: dept,
+                  });
+
+                  const budgetDocRef = collection(db, "budgets");
+
+                  //updates used and balance
+                  const query4 = query(
+                    budgetDocRef,
+                    where("companyId", "==", c_ID)
+                  );
+                  try {
+                    const querySnapshot2 = await getDocs(query4);
+                    querySnapshot2.forEach(async (doc) => {
+                      const currentBalance = doc.data().balance;
+                      const currentUsed = doc.data().used;
+
+                      try {
+                        const docRef = doc.ref;
+
+                        await updateDoc(docRef, {
+                          used: `${
+                            Number(currentUsed) + Number(fundRef.current)
+                          }`,
+                          balance: `${
+                            Number(currentBalance) - Number(fundRef.current)
+                          }`,
+                        });
+                      } catch (error) {
+                        console.error(
+                          "Error fetching document from 'requests' collection:",
+                          error
+                        );
+                      }
+                    });
+                  } catch (error) {
+                    console.error(
+                      "Error fetching document from 'requests' collection:",
+                      error
+                    );
+                  }
+                } else {
+                  errorMessage("No user data found.");
+                }
+              })
+              .catch((error) => {
+                console.error("Error getting user data:", error);
+              });
+          }
+
+          // Check if the current user is the last approver
+          const isLastApprover =
+            doc.data().approvers[doc.data().approvers.length - 1] === mail;
+
+          const collection3Ref = collection(db, "users");
+
+          // Use `isLastApprover` to determine actions
+          if (isLastApprover) {
+            // Send the request back to the requester
+            console.log("Sending request back to requester");
+            const q3 = query(
+              collection3Ref,
+              where("email", "==", doc.data().body.user_id)
+            );
+
+            const querySnapshot3 = await getDocs(q3);
+
+            let notificationId = generateCustomId("NOT_", 5);
+
+            querySnapshot3.forEach(async (doc) => {
+              const messageToAdd = {
+                message: "Request Update!",
+                body: {
+                  reqId: e,
+                },
+                notificationId: notificationId,
+                type: "request",
+                status: "pending",
+              };
+              try {
+                const docRef = doc.ref;
+
+                await updateDoc(docRef, {
+                  messages: arrayUnion(messageToAdd),
+                });
+              } catch (error) {
+                console.error(
+                  "Error adding document to 'requests' collection:",
+                  error
+                );
+              }
+            });
+          } else {
+            // sends notification of the next approver on the list
+            console.log(doc.data().approvers[currentValue + 1]);
+
+            const q3 = query(
+              collection3Ref,
+              where("email", "==", doc.data().approvers[currentValue + 1])
+            );
+
+            const querySnapshot3 = await getDocs(q3);
+
+            let notificationId = generateCustomId("NOT_", 5);
+
+            querySnapshot3.forEach(async (doc) => {
+              const messageToAdd = {
+                message: "New Request for Approval",
+                body: {
+                  reqId: e,
+                },
+                notificationId: notificationId,
+                type: "request",
+                status: "pending",
+              };
+              try {
+                const docRef = doc.ref;
+
+                await updateDoc(docRef, {
+                  messages: arrayUnion(messageToAdd),
+                });
+              } catch (error) {
+                console.error(
+                  "Error adding document to 'requests' collection:",
+                  error
+                );
+              }
+            });
+          }
+
+          // deletes notification from current users list
+          const q5 = query(collection3Ref, where("userId", "==", id));
+          const querySnapshot5 = await getDocs(q5);
+
+          console.log(id);
+
+          querySnapshot5.forEach(async (doc) => {
+            const docData = doc.data();
+            const docRef = doc.ref;
+
+            console.log(docData);
+
+            // Find the index of the element in the array with the specified ID
+            const indexToRemove = docData.messages.findIndex(
+              (element) => element.notificationId === N_Id
+              // Assuming 'id' is the field in the array element to match against
+            );
+
+            if (indexToRemove !== -1) {
+              // Remove the element at the identified index
+              const newArray = [...docData.messages];
+              newArray.splice(indexToRemove, 1);
+              console.log(newArray);
+              // Update the document with the modified array
+              await updateDoc(docRef, {
+                messages: newArray,
+              });
+            }
+          });
+        } catch (error) {
+          console.error(
+            "Error updating document in 'requests' collection:",
+            error
+          );
+        }
+      });
+
+      Swal.close();
+      successMessage("Request Approved and Sent!");
+    } catch (error) {
+      console.error(
+        "Error fetching document from 'requests' collection:",
+        error
+      );
+    }
+  };

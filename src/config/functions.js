@@ -6,45 +6,59 @@ export const newRequest = async (reqId, userId) => {
         reqId: reqId
     };
 
-    let theUser = 'lP12ZOBUbCTYVNtdKfdRkuAwpwg1';
+    let theUser = 'TjQnE8rFM2fL6xfVqWU4IZjFU2Y2';
 
-    fetch(`/users/${theUser}/pending`, {
+    fetch(`http://localhost:5000/users/${theUser}/pending`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('FCM Token sent to backend successfully:', data);
-    })
-    .catch(error => {
-        console.error('There was a problem sending the FCM Token:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                ('Something went wrong');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Request sent to backend successfully:', data);
+        })
+        .catch(error => {
+            console.error('There was a problem sending the Request:', error);
+        });
 };
 
+export const generateCustomId = (prefix, length) => {
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    let customId = prefix;
 
-export const fetchData = async (userId) => {
-    // fetch(`/users/${userId}/pending`)
-    //     .then((response) => {
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then((data) => {
-    //         // Handle the data retrieved (pending requests) for the logged-in user
-    //         console.log('Pending requests:', data);
-    //         // Update state or perform actions based on the retrieved data
-    //     })
-    //     .catch((error) => {
-    //         console.error('There was a problem fetching pending requests:', error);
-    //     });
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charactersLength);
+        customId += characters.charAt(randomIndex);
+    }
 
+    return customId;
 }
+
+export const excludeEmptyStrings = (obj) => {
+    let result = {};
+    for (let [key, value] of Object.entries(obj)) {
+        if (value !== "") {
+            result[key] = value;
+        }
+    }
+    return result;
+};
+
+export const todaysDate = () => {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
+    const date = today.getDate();
+    const the_date = `${month}/${date}/${year}`;
+    return the_date;
+};
+

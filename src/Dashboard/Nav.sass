@@ -4,7 +4,7 @@
     padding: 1rem .7rem
     width: 16vw
     background: #ffffff
-    height: 100vh
+    height: 100%
     position: fixed
     border: 1px solid #f5f5f5
     justify-content: space-between
@@ -14,6 +14,8 @@
         display: flex
         flex-direction: column
         gap: .5rem
+        margin: 0
+        padding: 0
 
         li
             display: flex
@@ -23,17 +25,10 @@
             border-radius: 6px
             align-items: flex-start
             cursor: pointer
+            color: #131010e3
 
         li:hover
             font-weight: 600
-
-        .new
-            background: #4CA5F1
-            color: white
-            font-weight: 600
-
-            .nav_icon
-                color: white
 
         .nav_icon
             width: 1.1rem
@@ -42,11 +37,43 @@
         background: #0f73cb08
         color: #4CA5F1
 
+    ul
+        height: fit-content
+
     ul:nth-child(1)
         display: flex
         flex-direction: column
         gap: 3rem
 
+    #first_one
+        margin-top: .4rem
+
+    .section_title
+        text-transform: uppercase
+        font-size: .7rem
+        color: grey
+        padding: 1rem .5rem
+
+    .nav_section
+        display: flex
+        flex-direction: column
+        gap: 1.5rem
+
+    .sidenav_logo
+        font-size: 1.1rem
+        color: #4CA5F1
+        font-weight: 700
+        padding: .5rem 1rem 0
+        text-align: center
+
+// request pop up
+.popup
+    width: 50vw
+    margin-left: 16vw
+    padding: 0
+    padding: 0
+    height: fit-content
+    border-radius: 0
 
 // Lil Nav
 .LilNav
@@ -60,6 +87,12 @@
     align-items: center
     font-size: .9rem
     width: 84vw
+    position: fixed
+    z-index: 999
+
+    ul
+        margin: 0
+        padding: 0
 
     .nav_title
         font-weight: 600
@@ -92,16 +125,423 @@
         height: 1.5rem
         border-radius: 50px
 
+    .lilnav_icon
+        cursor: pointer
+
+    .notification_container
+        position: absolute
+        right: 2rem
+        width: 24rem
+        background: white
+        top: 4rem
+        border-radius: 5px
+        border: 1px solid #f5f5f5
+        height: 28rem
+        padding: 1.5rem 0
+
+    .the_notifications
+        height: 100%
+
+    .notifications
+        height: 85%
+        overflow: scroll
+
+    .container_title
+        font-weight: 600
+        font-size: 1.1rem
+        padding: 0 1.5rem .5rem
+
+    .delete_section
+        position: relative
+        bottom: -.5rem
+        width: 100%
+        text-align: right
+        padding: 0 1.5rem
+        color: #F0785D
+        cursor: pointer
+        font-size: .8rem
+
+    .notification
+        display: flex
+        flex-direction: row
+        align-items: flex-start
+        gap: 1rem
+        cursor: pointer
+        padding: .2rem 1.5rem 0
+
+        &:hover
+            background: #F7FAFD
+
+        .notification_details
+            display: flex
+            flex-direction: column
+            padding: .5rem 0
+            gap: .3rem
+
+            .message_timeframe
+                font-size: .75rem
+                color: #00000080
+
+            .message
+                line-height: 1rem
+
+    .wait_icon
+        width: 1.5rem
+        padding: .6rem 0 0
+
+    .none
+        padding: .5rem 1.5rem
+        font-size: .8rem
+        color: grey
+        text-align: center
+        width: 100%
+        display: block
+
+// pop-up notify tab
+.notify
+    width: 65vw
+    margin-left: 16vw
+    padding: 0
+    height: fit-content
+    border-radius: 0
+    box-sizing: border-box
+    border-radius: 15px
+    min-height: 70vh
+
+    .container
+        width: 100%
+        margin: 0
+        display: flex!important
+        flex-direction: column
+        align-items: flex-start
+        justify-content: flex-start
+        font-size: .9rem
+        box-sizing: border-box
+        border-radius: 5px
+        // padding: 1rem 1rem 2rem
+        height: 100%
+
+        .first_title
+            width: 100%
+            background: #E2F1F9
+            height: 2.5rem
+            padding: 1rem 1rem 1rem 1.5rem
+            align-items: center
+            display: flex
+            flex-direction: row
+            justify-content: space-between
+            position: sticky
+
+        .request_dets
+            padding: 1rem 1rem 1rem 1.5rem
+            width: 100%
+            height: 35rem
+            overflow: scroll
+            overflow-x: hidden
+
+        .the_title
+            background: white
+            display: flex
+            flex-direction: column
+            justify-content: space-between
+            align-items: flex-start
+            width: 100%
+            box-sizing: border-box
+            color: #515050
+            font-size: 1.5rem
+            font-weight: 600
+            text-transform: capitalize
+            color: #000
+            gap: .5rem
+
+        #close
+            width: 1.1rem
+
+        .to_who
+            color: #000
+            width: 100%
+            text-align: left
+            display: flex
+            flex-direction: row
+            justify-content: space-between
+            font-size: .9rem
+            font-weight: 400
+
+            span:nth-child(2)
+                color: grey
+
+        .the_description
+            text-align: left
+            margin: 1.7rem 0
+            color: #000
+            height: 24rem
+            display: flex
+            flex-direction: column
+            width: 100%
+
+        .description
+            width: 100%
+            height: 14rem
+
+        .image_section
+            height: fit-content
+            display: flex
+            flex-direction: column
+            flex: 1
+            padding-top: 1rem
+
+            a
+                width: 5rem
+                border: none
+
+                &:focus
+                    border: none
+
+            .image_div
+                width: 20%
+                height: 6rem
+                background: #3a3b3d74
+
+            .section_text
+                padding-bottom: .5rem
+                color: grey
+
+        .description::first-letter
+            text-transform: capitalize
+
+        .reply_section
+            width: 95%
+            height: 20rem
+            padding: 1rem
+            border-radius: 5px
+            bottom: 1rem
+            z-index: 5
+            position: absolute
+            box-shadow: 4px 0px 10px 4px #00000014
+            background: white
+            display: none
+            flex-direction: column
+
+            .reply_attachments
+                padding: 1rem 0
+
+                div
+                    background: #76727238
+                    width: fit-content
+                    padding: .3rem .6rem
+                    display: flex
+                    flex-direction: row
+                    gap: .5rem
+                    font-size: .8rem
+
+                    img
+                        width: 1.1rem
+
+            .reply_head
+                display: flex
+                flex-direction: row
+                justify-content: space-between
+                align-items: center
+                text-transform: capitalize
+
+                #reply_close
+                    width: 1.1rem
+
+                .left_head
+                    display: flex
+                    flex-direction: row
+                    gap: .5rem
+                    align-items: center
+
+                .reply_icon
+                    width: 1.3rem
+
+                .reply_dept
+                    color: grey
+                    font-size: .8rem
+
+                .reply_name
+                    padding-left: .5rem
+
+            textarea
+                background: white
+                border: none
+                box-sizing: border-box
+                resize: none
+                height: 13rem
+                width: 100%
+                margin: 0 3%
+                font-size: .9rem
+                color: black
+                outline: none
+                padding: 1.5rem .3rem 0
+                margin: 0
+
+            .reply_buttons
+                flex: 1
+                display: flex
+                flex-direction: row
+                justify-content: space-between
+                align-items: flex-end
+
+                .left_buttons
+                    display: flex
+                    flex-direction: row
+                    gap: 1rem
+                    align-items: center
+
+                    .file
+                        width: 1.5rem
+
+                button
+                    padding: .6rem 1.2rem
+                    border: none
+                    outline: none
+                    background: #4CA5F1
+                    color: white
+
+                    &:hover
+                        background: #3d9bed
+
+                .trash_icon
+                    width: 1.1rem
+
+        .all_buttons
+            display: flex
+            flex-direction: row
+            position: relative
+            font-size: .85rem
+            align-items: flex-start
+            justify-content: space-between
+            width: 100%
+            gap: .4rem
+
+            .response
+                display: flex
+                flex-direction: row
+                gap: .6rem
+
+                .tag
+                    background: #3435362f
+                    padding: .6rem 1.1rem .6rem .8rem
+                    display: flex
+                    flex-direction: row
+                    font-size: .9rem
+                    gap: .3rem
+                    border-radius: 5px
+                    align-items: flex-start
+                    cursor: pointer
+
+                    &:hover
+                        background: #34353645
+
+                .approve
+                    background: blue
+
+                    &:hover
+                        background: #0c4c8c45
+
+                .dot
+                    font-size: 4rem
+                    line-height: 1rem
+                    position: relative
+                    top: -1.2rem
+
+            .buttons
+                display: flex
+                flex-direction: row
+                gap: .6rem
+                align-items: center
+
+                img
+                    cursor: pointer
+
+                button
+                    padding: .6rem 1.2rem
+
+                button:nth-child(3)
+                    border: none
+                    outline: none
+                    background: #4CA5F1
+                    color: white
+
+                    &:hover
+                        background: #3d9bed
+
+                button:nth-child(2)
+                    border: none
+                    outline: none
+                    background: #a1cef443
+                    color: #4CA5F1
+
+                    &:hover
+                        background: #3d9bed
+
+                    &:hover
+                        background: #a1cff472
+
+                button:nth-child(1)
+                    border: none
+                    outline: none
+                    background: #fbdb0b22
+                    color: #dfc51b
+                    display: none
+                    
+                    &:hover
+                        background: #eecf0831
+
+            #image_field
+                width: 1.5rem
+
+    .note
+        display: flex
+        flex-direction: row
+        border-left: 3px solid #E2F1F9 
+        margin: 0 0 1rem 1.5rem
+        padding: .5rem 1rem
+        align-items: center
+
+    .image_letter
+        background: #3D9BED
+        font-size: 1.1rem
+        font-weight: 600
+        padding: .8rem 1rem
+        color: white
+        border-radius: 50px
+        line-height: 1rem
+        height: fit-content
+        margin-right: .8rem
+
+    .note_email
+        font-size: .9rem
+        font-weight: 600
+
+    .note_response
+        font-size: .8rem
+        padding-top: .5rem
+        text-transform: capitalize
+        font-weight: 500
+
+    .note_header
+        padding: 1rem 0
+        text-transform: uppercase
+        font-size: .7rem
+        font-weight: 600
+
+    #notes_div
+        height: 9rem
+        overflow: scroll
 
 // request pop up
-.popup
-    width: 50vw
+.request_popup
+    width: 65vw
     margin-left: 16vw
     padding: 0
     padding: 0
     height: fit-content
     border-radius: 0
     box-sizing: border-box
+    border-radius: 5px
 
     .container
         width: 100%
@@ -192,23 +632,7 @@
                 width: 16rem
                 align-items: center
 
-                .fileinputs
-                    position: relative
-                    width: 2rem
-                    height: 1.5rem
-
-                    .fakefile
-                        position: absolute
-                        top: 0px
-                        left: 0px
-                        z-index: 1
-
-                    .file
-                        position: relative
-                        text-align: right
-                        -moz-opacity: 0
-                        opacity: 0
-                        z-index: 2
+                
 
         img
             width: 1.5rem
@@ -224,20 +648,39 @@
         .ok_button
             background: #4CA5F1
 
+.fileinputs
+    position: relative
+    width: 2rem
+    height: 1.5rem
+
+    .fakefile
+        position: absolute
+        top: 0px
+        left: 0px
+        z-index: 1
+
+    .file
+        position: relative
+        text-align: right
+        -moz-opacity: 0
+        opacity: 0
+        z-index: 2
 
 // invite pop up
 .invite_popup
-    width: 40vw
+    width: 45vw
     margin-left: 16vw
     padding: 0
     height: fit-content
     border-radius: 0
     box-sizing: border-box
+    border-radius: 5px
 
     .invite_container
+        border-radius: 5px
         width: 100%
         margin: 0
-        padding: 1.2rem 
+        padding: 1.2rem
         display: flex!important
         flex-direction: column
         align-items: flex-start
@@ -256,7 +699,7 @@
                 flex-direction: column
                 width: 100%
                 align-items: flex-start
-                font-size: 1.9rem
+                font-size: 1.7rem
                 padding-top: .3rem
                 font-weight: 600
                 color: #4AA0D5
@@ -273,7 +716,6 @@
 
                 #close
                     width: 1.2rem
-
 
             .lil_heading
                 text-align: left
@@ -300,6 +742,7 @@
             background: #4AA0D5
             margin-bottom: .4rem
             border: none
+            color: white
 
         button:hover
             background: #4aa0d5e8
@@ -315,3 +758,169 @@
                 width: fit-content
                 height: fit-content
                 padding: .7rem 1.2rem
+
+
+// pop-up fund tab
+.fund
+    width: 45vw
+    margin-left: 16vw
+    padding: 0
+    height: fit-content
+    border-radius: 0
+    box-sizing: border-box
+    border-radius: 15px
+    min-height: 70vh
+
+    .container
+        width: 100%
+        margin: 0
+        display: flex!important
+        flex-direction: column
+        align-items: flex-start
+        justify-content: flex-start
+        font-size: .9rem
+        box-sizing: border-box
+        border-radius: 5px
+        height: 100%
+
+        .first_title
+            width: 100%
+            background: white
+            height: 2.5rem
+            padding: 1rem 1rem 1rem 1.5rem
+            align-items: center
+            display: flex
+            flex-direction: row
+            justify-content: flex-end
+            position: sticky
+
+        .request_dets
+            padding: 0  1.5rem
+            width: 100%
+            height: fit-content
+            overflow: scroll
+
+        .the_title
+            background: white
+            display: flex
+            flex-direction: column
+            justify-content: space-between
+            align-items: flex-start
+            width: 100%
+            box-sizing: border-box
+            color: #515050
+            font-size: 1.5rem
+            font-weight: 600
+            text-transform: capitalize
+            color: #000
+            gap: .5rem
+
+        #close
+            width: 1.1rem
+
+        .the_description
+            text-align: left
+            margin: 1rem 0 0
+            color: #000
+            height: fit-content
+            display: flex
+            flex-direction: column
+            width: 100%
+
+            .fund_head
+                font-size: .8rem
+                text-transform: uppercase
+                font-weight: 600
+
+            .fund_head:nth-child(1)
+                padding: 0 0 1rem
+
+            .fund_head:nth-child(2)
+                padding: 1rem 0 0
+
+            .fund_head:nth-child(3)
+                padding: 1rem 0 .6rem
+
+            .fund_head:nth-child(4)
+                padding: 1rem 0 1rem
+
+            .fund_account
+                display: flex
+                flex-direction: column
+                width: 100%
+                align-items: center
+
+                .fund_month
+                    font-size: 3rem
+                    font-weight: 600
+
+                .fund_year
+                    font-size: .9rem
+                    padding: .5rem 0 1rem
+
+                    span
+                        color: grey
+
+        .description
+            width: 100%
+            display: flex
+            flex-direction: row
+            flex-wrap: wrap
+            gap: .6rem 2.5rem
+            padding: 0 0 1.8rem
+
+            .sub_dets
+                width: 45%
+                display: flex
+                flex-direction: column
+                gap: .3rem
+
+                span
+                    color: grey
+                    font-size: .8rem
+
+                div
+                    font-weight: 400
+                    font-size: .9rem
+
+            .sub_dets:nth-child(1), .sub_dets:nth-child(3)
+                text-transform: capitalize
+            
+
+        label
+            width: 100%
+            display: flex
+            flex-direction: column
+            gap: .5rem
+            height: fit-content
+
+            span
+                font-size: .8rem
+                color: grey
+
+            input[type="text"]
+                height: 2.5rem
+                padding: 1rem 
+                border: 1px solid grey
+                border-radius: 5px
+
+        .buttons
+            display: flex
+            flex-direction: row
+            gap: .6rem
+            padding: .5rem 1.5rem 1.5rem
+            width: 100%
+
+            button
+                padding: .8rem 1.2rem
+
+            button
+                border: none
+                outline: none
+                background: #4CA5F1
+                color: white
+                width: 100%
+                border-radius: 5px
+
+                &:hover
+                    background: #3d9bede3

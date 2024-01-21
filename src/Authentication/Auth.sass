@@ -31,7 +31,7 @@
         display: flex
         flex-direction: column
         margin: 0
-        width: 90%
+        width: 100%
 
 .sub_auth, .auth_section
     padding: 0 4rem
@@ -70,14 +70,14 @@
 
     a
         font-weight: 600
-        color: #4aa0d5 
+        color: #4aa0d5
 
         &:hover
             text-decoration: underline
 
 form
     gap: 1rem
-    width: 90%!important
+    // width: 90%!important
 
     label
         width: 100%
@@ -204,6 +204,8 @@ form
     display: flex
     flex-direction: column
     padding: 0 0 2rem
+    height: fit-content
+    width: 100%
 
     .add_title
         font-weight: 600
@@ -214,6 +216,7 @@ form
 
     .add_frame
         padding: 1rem 0 0
+        width: 100%
 
         .add_button
             width: fit-content
@@ -246,19 +249,20 @@ form
             box-sizing: border-box
             color: #000000a2
 
-
         .budget_label
             width: 100%
             align-items: flex-start
             flex-direction: column!important
 
             input
-                width: 100%
+                width: 70%
 
 .added
     display: flex
     flex-direction: column
     padding: 1rem 0
+    height: 10rem
+    overflow: scroll
 
     .added_title
         font-size: .9rem
@@ -281,7 +285,7 @@ form
 .button_section
     display: flex
     align-items: center
-    justify-content: center
+    justify-content: flex-end
     width: 100%
 
     .save_button
@@ -299,7 +303,6 @@ form
 
 .auth_section
     padding: 3rem 4rem 5rem
-    overflow: scroll
 
 .added_budget
     display: flex
@@ -307,7 +310,6 @@ form
     align-items: center
     gap: .5rem
     font-size: .9rem
-    
 
 :root
     border-bottom: none
@@ -321,7 +323,148 @@ form
 .auths_header
     text-align: left
     width: 100!important
-    padding-top: 5rem
+    padding: 2rem 0
 
 option
     text-transform: capitalize
+
+// setup
+.added_email
+    font-size: .9rem
+    color: #000000a2
+    padding: .3rem 1rem .4rem
+    width: 50%
+
+.added_approvers
+    font-size: .95rem
+    font-weight: 600
+    padding: 1rem 0 .5rem
+
+//radio button
+label
+    display: flex
+    padding: 5px 0
+    font-size: .9rem
+    cursor: pointer
+    width: 100%
+
+input[type="radio"]
+    opacity: 0
+    margin: 0
+    width: 0
+
+.value
+    position: relative
+    display: flex
+    align-items: center
+    padding: 1rem 2rem 1rem 3rem
+    overflow: hidden
+    width: 100%
+    z-index: 1
+
+    &:hover
+        background: #4aa0d50e
+
+    &::before
+        content: ""
+        position: absolute
+        left: 30px
+        width: 6px
+        height: 6px
+        border-radius: 50%
+        outline-offset: 3px
+        outline: 2px solid grey
+
+    &::after
+        content: ""
+        position: absolute
+        left: 29px
+        top: 21px
+        width: 8.5px
+        height: 8.5px
+        border-radius: 50%
+
+input[type="radio"]:checked ~ .value
+        color: #2f8edc
+        border-width: 5px
+        background: #4aa0d52c
+
+input[type="radio"]:checked ~ .value::after
+        top: 22.5px
+        background: #2f8edc
+
+input[type="radio"]:checked ~ .value::before
+        outline: 2px solid #2f8edc
+
+// Checkbox styles
+.the_label
+    display: flex
+    padding: 5px 0
+    font-size: .9rem
+    cursor: pointer
+    width: 100%
+    padding-left: 1rem
+
+    // Style for the label content
+    .the_value
+        position: relative
+        display: flex
+        align-items: center
+        padding: 1rem 2rem 1rem 1rem
+        overflow: hidden
+        width: 100%
+
+    // Hover effect
+    &:hover
+        background: #4aa0d50e
+
+.auth_nav
+    padding: 1.5rem 3rem
+
+.my_added
+    height: fit-content
+
+.full_section
+    // height: 100vh
+    // overflow: scroll
+    width: 100%
+    
+
+.main_auth
+    height: 100vh
+    width: 100%
+
+    .auth_section
+        width: 100%
+        height: 100%
+        overflow: scroll
+        display: block
+        padding: 5rem 10rem
+
+        .my_added
+            width: 70%
+
+        h2
+            text-align: center
+
+.main_nav
+    width: 100%
+    position: fixed
+
+    .auth_nav
+        background: white
+        display: flex
+        flex-direction: row
+        width: 100%
+        height: 3rem
+        align-items: center
+        // background-color: white
+        border-bottom: 1px solid #E4E4E4
+        position: fixed
+        top: 0
+        left: 0
+        padding: 1.8rem 4rem
+        z-index: 999
+
+// .the_approvers
+//     z-index: 1

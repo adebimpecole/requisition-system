@@ -124,17 +124,17 @@ const SignupB = () => {
       }
       if (isCompanyCodeValid) {
         try {
-          // Create a new user with email and password
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
-
-          const user = userCredential.user;
-          const userId = user.uid;
           // Check if companyName is not empty
           if (the_companyName) {
+            // Create a new user with email and password
+            const userCredential = await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+  
+            const user = userCredential.user;
+            const userId = user.uid;
             // Add the user's registration data to Firestore
             const usersCollectionRef = collection(db, "users");
             await addDoc(usersCollectionRef, {
@@ -146,6 +146,7 @@ const SignupB = () => {
               company_name: the_companyName, // This should be the resolved company name
               department: dept.toLowerCase(),
               userId: userId,
+              messages: [],
             });
             let the_token = await getFCMToken(userId);
 
@@ -176,6 +177,30 @@ const SignupB = () => {
               .catch((error) => {
                 console.error("Error querying Firestore:", error);
               });
+
+            const ws = new WebSocket(`ws://localhost:8080?userId=${userId}`);
+
+            ws.onopen = () => {
+              console.log("WebSocket connection opened");
+
+              // Start sending messages or perform actions upon successful connection
+              // Example: ws.send('Hello, WebSocket Server!');
+            };
+
+            ws.onmessage = (event) => {
+              console.log("Received message:", event.data);
+              // Handle incoming messages from the WebSocket server
+            };
+
+            ws.onclose = () => {
+              console.log("WebSocket connection closed");
+              // Handle WebSocket connection close event
+            };
+
+            ws.onerror = (error) => {
+              console.error("WebSocket error:", error);
+              // Handle WebSocket errors
+            };
 
             setfcmToken(the_token);
             setuser(firstName);
@@ -246,7 +271,7 @@ const SignupB = () => {
       </div>
       <div className="auth_content">
         <div className="auth_section">
-          <h2 className="page_header">Sign Up B</h2>
+          <h2 className="page_header">Sign Up</h2>
           <form>
             <div className="required">* Required Fields</div>
             <div className="sub_form">

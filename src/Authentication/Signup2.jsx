@@ -50,17 +50,10 @@ const Signup2 = () => {
             password: password,
           });
 
-          // // Generate an FCM token for the user
-          // const fcmToken = await admin.messaging().getToken(userRecord.uid);
-
-          // // Save the FCM token to the Firestore database
-          // await db.collection("users").doc(userId).set({
-          //   fcmToken: fcmToken,
-          // });
 
           setuser(companyName);
           setid(userId);
-          console.log(userId);
+
           setpage("Dashboard");
           navigate("/authenticate");
         } catch (error) {

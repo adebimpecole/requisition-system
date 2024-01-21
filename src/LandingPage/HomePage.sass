@@ -9,20 +9,29 @@
     box-sizing: border-box
     height: 100vh
     overflow: hidden
+    gap: 2.5rem
     
 .HomePage
     padding: 1rem 3rem
     background-image: url(../assets/lines.png)
     background-repeat: no-repeat
     background-position: bottom
-    background-size: contain
+    background-size: cover
     background-color: #FCFDFF
     height: 100vh
     overflow: hidden
 
+.home_header
+    font-size: 2.8rem
+    text-align: center
+    font-weight: 800
+    width: 100%
+
+.home_sub_text
+    width: 90%
 
 .home_text
-    width: 70%
+    width: 80%
     display: flex
     flex-direction: column
     align-items: center
@@ -57,6 +66,7 @@
     &:hover
         border: 1px solid rgb(76, 165, 241)
         background: #FCF#c3d4f4
+        color: rgb(76, 165, 241)
 
 
 .hompeage_buttons
@@ -69,20 +79,19 @@
     font-size: .95rem
 
 .home_image
+    flex: 1
     width: 100%
     overflow: hidden
     display: flex
-    align-items: center
+    align-items: flex-start
     justify-content: center
 
 .the_image
-    width: 48rem
+    width: 70vw
     height: auto
     border: 1px solid #E4E4E4
     border-radius: 10px
-    height: fit-content
-    position: relative
-    bottom: -1rem
+    object-position: top
 
 .home_sub_text
     text-align: center

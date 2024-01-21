@@ -30,11 +30,7 @@ const Authentication = () => {
   const [department, setDepartment] = useState([]);
   const [deptValue, setDeptValue] = useState("");
 
-  const [yearValue, setYearValue] = useState("");
   const [yearBudget, setYearBudget] = useState("");
-
-  const [monthBudget, setMonthBudget] = useState("");
-  const [monthValue, setMonthValue] = useState("");
 
   const handleAddDept = () => {
     setDepartment([...department, deptValue]);
@@ -48,33 +44,26 @@ const Authentication = () => {
   const SaveSection = async (e) => {
     e.preventDefault();
 
-    if (department.length === 0 || yearBudget === "" || monthBudget === "") {
-      console.log(true);
+    if (department.length === 0 || yearBudget === "") {
+      errorMessage("Fill in the required fields")
     } else {
       try {
         // Add the departments to Firestore
         const collectionRef = collection(db, "departments");
-        // creates a new document for each department
-        // department.forEach(async (item) => {
-        //     await addDoc(collectionRef, {
-        //         companyId: id,
-        //         department: item,
-        //     });
-        // })
-
-          await addDoc(collectionRef, {
-            companyId: id,
-            department: department,
-          });
+        await addDoc(collectionRef, {
+          companyId: id,
+          department: department,
+        });
 
         // Add the users name to Firestore
         const budgetCollectionRef = collection(db, "budgets");
         await addDoc(budgetCollectionRef, {
           companyId: id,
-          monthlyBudget: monthBudget,
           yearlyBudget: yearBudget,
+          balance: yearBudget,
+          used: 0,
         });
-        navigate("/admindash");
+        navigate("/setup");
       } catch (error) {
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -95,12 +84,12 @@ const Authentication = () => {
         <div className="auth_section">
           <h2 className="page_header auths_header">Set Up Your Company Info</h2>
           <div className="add_section">
-            <div class="add_title">Add Departments</div>
-            <div class="add_note">
+            <div className="add_title">Add Departments</div>
+            <div className="add_note">
               Kindly input the various departments that exist in your company
               and save your entries
             </div>
-            <div class="add_frame">
+            <div className="add_frame">
               <label>
                 <input
                   type="text"
@@ -108,7 +97,7 @@ const Authentication = () => {
                   value={deptValue}
                   onChange={(e) => setDeptValue(e.target.value)}
                 />
-                <div class="add_button" onClick={handleAddDept}>
+                <div className="add_button" onClick={handleAddDept}>
                   {" "}
                   <img src={add} alt="add_icon" />
                   Add Department
@@ -116,26 +105,29 @@ const Authentication = () => {
               </label>
             </div>
             <div className="added">
-              <div className="added_title"> Departments</div>
-              {department.map((item, index) => (
-                <div className="added_tab" key={index}>
-                  <div className="added_name">{item}</div>
-                  <img
-                    src={trash}
-                    alt="trash_icon"
-                    onClick={() => handleDeleteDept(index)}
-                  />
-                </div>
-              ))}
+              {department.length > 0 ? (
+                <>
+                  <div className="added_title"> Departments</div>
+                  {department.map((item, index) => (
+                    <div className="added_tab" key={index}>
+                      <div className="added_name">{item}</div>
+                      <img
+                        src={trash}
+                        alt="trash_icon"
+                        onClick={() => handleDeleteDept(index)}
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <span></span>
+              )}
             </div>
           </div>
 
           <div className="add_section">
             <div className="add_title">Add Budget</div>
-            <div className="add_note">
-              Dedicate and approve your company's budget for whatever time
-              period is required.
-            </div>
+            <div className="add_note">Input your company's yearly budget.</div>
             <div className="add_frame">
               <label className="budget_label">
                 Yearly Budget
@@ -144,17 +136,7 @@ const Authentication = () => {
                   placeholder="$ xxxxxxxx"
                   value={yearBudget}
                   onChange={(e) => setYearBudget(e.target.value)}
-                />
-              </label>
-            </div>
-            <div className="add_frame">
-              <label className="budget_label">
-                Monthly Budget
-                <input
-                  type="text"
-                  placeholder="$ xxxxxxxx"
-                  value={monthBudget}
-                  onChange={(e) => setMonthBudget(e.target.value)}
+                  className="year_budget"
                 />
               </label>
             </div>

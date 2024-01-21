@@ -15,5 +15,11 @@ service cloud.firestore {
     match /departments/{document=**} {
       allow read, write;
     }
+    match /pendingMessages/{document=**} {
+      allow read, write;
+    }
+    match /expenses/{document=**} {
+      allow read, write;
+    }
   }
 }

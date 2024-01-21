@@ -25,7 +25,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const db = getFirestore();
 
-  let { user, setuser, id, setid } = useContext(Context);
+  let { user, setuser, id, setid, setpage, setrole } = useContext(Context);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -34,6 +34,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dept, setDept] = useState("");
+  const [departments, setDepartments] = useState();
 
   const companyId = new URLSearchParams(location.search).get("companyId");
 
@@ -64,6 +65,41 @@ const Signup = () => {
       .catch((error) => {
         console.error("Error getting user data:", error);
       });
+
+    let the_companyName;
+    async function fetchData() {
+      if (companyIdFromUrl !== "") {
+        try {
+          // Reference to your Firestore collection where user data is stored
+          const userCollectionRef = collection(db, "departments");
+
+          // Create a query to find documents where userId matches companyCode
+          const query2 = query(
+            userCollectionRef,
+            where("companyId", "==", companyIdFromUrl)
+          );
+          const querySnapshot = await getDocs(query2);
+
+          if (!querySnapshot.empty) {
+            // Retrieve the first document that matches the query
+            const docSnapshot = querySnapshot.docs[0];
+            const userData = docSnapshot.data();
+
+            // Set the resolved company name
+            the_companyName = userData;
+            setDepartments(userData.department);
+            console.log(userData);
+          } else {
+            errorMessage("No user data found for this company ID.");
+            return false;
+          }
+        } catch (error) {
+          console.error("Error checking company code:", error);
+        }
+      } else {
+      }
+    }
+    fetchData();
   }, [companyId, db]);
 
   const onSubmit = async (e) => {
@@ -83,14 +119,15 @@ const Signup = () => {
       // Add the users name to Firestore
       const usersCollectionRef = collection(db, "users");
       await addDoc(usersCollectionRef, {
-        last_name: lastName,
-        first_name: firstName,
+        last_name: lastName.toLowerCase(),
+        first_name: firstName.toLowerCase(), // Use the correct field names
         userId: userId,
         email: email,
         password: password,
         role: userrole,
         company_name: urlcompanyName,
-        department: dept,
+        department: dept.toLowerCase(),
+        messages: [],
       });
 
       // const fcmToken = await admin.messaging().getToken(userRecord.uid);
@@ -103,7 +140,8 @@ const Signup = () => {
 
       setuser(firstName);
       setid(userId);
-      console.log("passsed");
+      setrole(userrole)
+      setpage("Home");
       navigate("/dashb");
     } catch (error) {
       const errorCode = error.code;
@@ -122,7 +160,7 @@ const Signup = () => {
       </div>
       <div className="auth_content">
         <div className="auth_section">
-          <h2 className="page_header">Sign Up URL</h2>
+          <h2 className="page_header">Sign Up</h2>
           <form>
             <div className="required">* Required Fields</div>
             <div className="sub_form">
@@ -171,11 +209,18 @@ const Signup = () => {
                 onChange={(e) => setDept(e.target.value)}
                 value={dept}
               >
-                <option value="default">- Select Department -</option>
-                <option value="finance">Finance</option>
-                <option value="audit">Audit</option>
-                <option value="hr">HR</option>
-                <option value="account">Accounting</option>
+                {departments ? (
+                  <>
+                    <option value="loading">-Select Department-</option>
+                    {departments.map((the_dept, index) => (
+                      <option value={the_dept} key={index}>
+                        {the_dept}
+                      </option>
+                    ))}
+                  </>
+                ) : (
+                  <option value="loading">Loading ...</option>
+                )}
               </select>
             </label>
             <label>
