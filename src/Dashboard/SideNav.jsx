@@ -10,7 +10,7 @@ import { Context } from "../Utilities/Context";
 import { auth } from "../config/firebase";
 import { newRequest } from "../config/functions";
 import {
-  addToFirestore,
+  addToFirestore,  
   fetchDataFromFirestore,
   updateArrayFirestore,
   uploadImage,
@@ -71,7 +71,8 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     setpage,
     page,
   } = useContext(Context);
-
+  
+  const imageRef = useRef(null);
   const titleRef = useRef("");
   const descRef = useRef("");
   const emailRef = useRef("");
@@ -135,7 +136,6 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     }
   };
 
-  const [image, setImage] = useState(null);
 
   // getting user input
   const catchInput = (e) => {
@@ -167,7 +167,7 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     var fileName = the_input.value.split("\\").pop(); // Extract just the file name
     childElement.innerHTML = `${fileName}`;
 
-    // setImage(file);
+    imageRef.current = file;;
     console.log(the_input.files);
 
     countImgRef.current = countImgRef.current + 1;
@@ -176,11 +176,11 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     the_div.appendChild(childElement);
   };
 
-  const handleFileChange = (event) => {
-    console.log(event)
-    const file = event.target.files[0];
-    setImage(file);
-  };
+  // const handleFileChange = (event) => {
+  //   console.log(event)
+  //   const file = event.target.files[0];
+  //   setImage(file);
+  // };
 
   // handles request actions
   const DeleteReq = () => {
@@ -198,8 +198,10 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
 
       if (countImgRef.current > 0) {
         attachment = true;
+        console.log(imageRef.current)
         // upload image to firestore if an image was selected and get the url
-        image_url = await uploadImage(image, "request", id, customId);
+        
+        image_url = await uploadImage(imageRef.current, "request", id, customId);
       }
       try {
         let companyData = await fetchDataFromFirestore(
@@ -208,7 +210,7 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
           company
         );
 
-        console.log(image_url);
+        const newApprovers = (companyData.approvers).filter(item => item !== companyData.verificationAuthority);
 
         const requestData = {
           user_id: id,
@@ -221,8 +223,9 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
           department: dept,
           is_attachment: attachment,
           approvalIndex: 0,
-          approvers: companyData.approvers,
-          approvedBy: [],
+          approvers: newApprovers,
+          verifier: companyData.verificationAuthority,
+          messages: [],
           is_link: false,
           image_url: image_url,
         };
@@ -309,8 +312,7 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
 
             const the_html = ` 
             <div class='title_bar'> 
-              New Request: 
-              ${customId} - ${firstname} ${lastname} 
+              New Request by ${firstname} ${lastname} 
               <img id='close' src= ${iclose} alt='alert_icon' style='cursor:pointer'/> 
             </div> 
             <input id="swal-input1" class="swal2-input" type="text" value="" autocomplete="off">

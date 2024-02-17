@@ -1,16 +1,14 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useTable } from "react-table";
 
+import { openRequest } from '../config/Modals';
+
 import { getFirestore, collection, query, where, getDocs, doc, addDoc, getDoc } from 'firebase/firestore';
 
-import Swal from 'sweetalert2'
-import 'sweetalert2/src/sweetalert2.scss'
 
 import { Context } from '../Utilities/Context';
 import '../Dashboard2/Company.sass';
 import './Table.sass'
-
-import iclose from "../assets/close.svg"
 
 export default function Table() {
 
@@ -81,43 +79,6 @@ export default function Table() {
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
         useTable({ columns, data });
 
-    const CloseReq = () => {
-        Swal.close()
-    }
-
-    const openRequest = (e) => {
-        console.log(e)
-        console.log(e.values.date)
-        const swal = Swal.fire({
-            html:
-                "<div class='the_title'>" +
-                "<span> " + e.values.title + "</span>" +
-                "<img id='close' src='" + iclose + "' alt='alert_icon' style='cursor:pointer'/>" +
-                "</div>" +
-                '<div class="to_who">' +
-                'REQUEST ID - ' + e.values.requset_id +
-                '</div>' +
-                '<div class="the_description" >' +
-                e.values.description +
-                '</div>' +
-                '<div class="other_details">' +
-                '<span>Sent on the' + e.values.date + '</span>' +
-                '<span>Received on the' + e.values.date + '</span>' +
-                '<span>Seen by ' + e.values.date + '</span>' +
-                '<span>Status - ' + e.values.status + '</span>' +
-                '</div>' +
-                "</span>",
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            customClass: {
-                popup: 'popup',
-                htmlContainer: 'container',
-            },
-        });
-        // Close request
-        const closeButton = document.getElementById('close');
-        closeButton.addEventListener('click', () => CloseReq());
-    }
     return (
         <div className="the_table">
             <div className='table_name'>Recent Requests <span onClick={() => setpage("Requests")}>View All</span></div>
@@ -141,7 +102,7 @@ export default function Table() {
                             {rows.map((row) => {
                                 prepareRow(row);
                                 return (
-                                    <tr {...row.getRowProps()} onClick={() => openRequest(row)}>
+                                    <tr {...row.getRowProps()} onClick={() => openRequest(row.values)}>
                                         {row.cells.map((cell, cellIndex) => {
                                             return (
                                                 <td {...cell.getCellProps()} className='fixed-column'>

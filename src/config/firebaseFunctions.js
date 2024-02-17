@@ -1,12 +1,31 @@
-
-import { storage } from './firebase';
-import { getFirestore, collection, query, where, getDocs, doc, addDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { ref, uploadBytes, updateMetadata, getDownloadURL } from 'firebase/storage';
+import { storage } from "./firebase";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  addDoc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  updateMetadata,
+  getDownloadURL,
+} from "firebase/storage";
 
 const db = getFirestore();
 
 // Function to fetch data from Firestore
-export const fetchDataFromFirestore = async (the_collection, the_match1, the_match2) => {
+export const fetchDataFromFirestore = async (
+  the_collection,
+  the_match1,
+  the_match2
+) => {
   const collectionRef = collection(db, the_collection);
   const q = query(collectionRef, where(the_match1, "==", the_match2));
 
@@ -25,7 +44,6 @@ export const fetchDataFromFirestore = async (the_collection, the_match1, the_mat
   }
 };
 
-
 // Function to add data to Firestore
 export const addToFirestore = async (the_colllection, data) => {
   const collectionRef = collection(db, the_colllection);
@@ -37,33 +55,41 @@ export const addToFirestore = async (the_colllection, data) => {
     .catch((error) => {
       console.error("Error adding document:", error);
     });
-
 };
 
 // Function to update data in Firestore
-export const updateFirestore = async (the_colllection, the_match2, data) => {
+export const updateFirestore = async (
+  the_colllection,
+  fieldName,
+  the_match,
+  data
+) => {
+  console.log(data);
+  const collectionRef = collection(db, the_colllection);
+  const q = query(collectionRef, where(fieldName, "==", the_match));
 
-  console.log(data)
-  // Found a document that matches the criteria
-  const docRef = doc(db, the_colllection, the_match2);
+  const querySnapshot = await getDocs(q);
 
-  // Update the document
-  updateDoc(docRef, data)
-    .then(() => {
-      console.log("Document updated successfully");
-    })
-    .catch((error) => {
-      console.error("Error updating document:", error);
-    });
-
-}
+  querySnapshot.forEach(async (doc) => {
+    try {
+      const docRef = doc.ref;
+      await updateDoc(docRef, data);
+    } catch (error) {
+      console.error(`Error adding document to '${type}' collection:`, error);
+    }
+  });
+};
 
 // Function to update data in Firestore
-export const updateArrayFirestore = async (the_colllection, the_match1, the_match2, dataType, data) => {
-
+export const updateArrayFirestore = async (
+  the_colllection,
+  fieldName,
+  the_match,
+  arrayFieldName,
+  data
+) => {
   const collectionRef = collection(db, the_colllection);
-  const q = query(collectionRef, where(the_match1, "==", the_match2));
-
+  const q = query(collectionRef, where(fieldName, "==", the_match));
 
   const querySnapshot = await getDocs(q);
 
@@ -71,23 +97,23 @@ export const updateArrayFirestore = async (the_colllection, the_match1, the_matc
     try {
       const docRef = doc.ref;
       await updateDoc(docRef, {
-        messages: arrayUnion(data),
+        [arrayFieldName]: arrayUnion(data),
       });
     } catch (error) {
-      console.error(
-        `Error adding document to '${type}' collection:`,
-        error
-      );
+      console.error(`Error adding document to '${type}' collection:`, error);
     }
   });
-}
+};
 
 // Function to add image to Firestore
 export const uploadImage = (file, type, id, reqID) => {
   return new Promise(async (resolve, reject) => {
-    console.log(file)
+    console.log(file);
     const timestamp = new Date().getTime();
-    const newFileName = type === "request" ? `${reqID}_${file.name}` : `${timestamp}_${file.name}`;
+    const newFileName =
+      type === "request"
+        ? `${reqID}_${file.name}`
+        : `${timestamp}_${file.name}`;
 
     // Create a new File object with the modified name
     const modifiedFile = new File([file], newFileName);
@@ -109,7 +135,7 @@ export const uploadImage = (file, type, id, reqID) => {
       };
       await updateMetadata(storageRef, metadata);
 
-      console.log('Image uploaded successfully');
+      console.log("Image uploaded successfully");
 
       if (type === "request") {
         const downloadURL = await getDownloadURL(storageRef);
@@ -117,7 +143,7 @@ export const uploadImage = (file, type, id, reqID) => {
         resolve(downloadURL);
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       reject(error);
     }
   });

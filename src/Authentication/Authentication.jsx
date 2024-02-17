@@ -84,9 +84,9 @@ const Authentication = () => {
         <div className="auth_section">
           <h2 className="page_header auths_header">Set Up Your Company Info</h2>
           <div className="add_section">
-            <div className="add_title">Add Departments</div>
+            <div className="add_title">Add Sections</div>
             <div className="add_note">
-              Kindly input the various departments that exist in your company
+              Kindly input the various sections / branches that exist in your company
               and save your entries
             </div>
             <div className="add_frame">
@@ -100,7 +100,7 @@ const Authentication = () => {
                 <div className="add_button" onClick={handleAddDept}>
                   {" "}
                   <img src={add} alt="add_icon" />
-                  Add Department
+                  Add Section
                 </div>
               </label>
             </div>
@@ -133,7 +133,7 @@ const Authentication = () => {
                 Yearly Budget
                 <input
                   type="text"
-                  placeholder="$ xxxxxxxx"
+                  placeholder="₦ xxxxxxxx"
                   value={yearBudget}
                   onChange={(e) => setYearBudget(e.target.value)}
                   className="year_budget"

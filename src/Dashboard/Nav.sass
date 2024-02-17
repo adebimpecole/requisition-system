@@ -71,7 +71,6 @@
     width: 50vw
     margin-left: 16vw
     padding: 0
-    padding: 0
     height: fit-content
     border-radius: 0
 
@@ -168,6 +167,7 @@
         gap: 1rem
         cursor: pointer
         padding: .2rem 1.5rem 0
+        border-left: 3px solid #4CA5F1
 
         &:hover
             background: #F7FAFD
@@ -185,6 +185,9 @@
             .message
                 line-height: 1rem
 
+            .notification_text
+                font-size: .8rem
+
     .wait_icon
         width: 1.5rem
         padding: .6rem 0 0
@@ -196,6 +199,105 @@
         text-align: center
         width: 100%
         display: block
+
+// pop-up update tab
+.update
+    width: 50vw
+    margin-left: 16vw
+    padding: 0
+    height: fit-content
+    border-radius: 0
+    box-sizing: border-box
+    border-radius: 15px
+    min-height: 18vh
+
+    .container
+        width: 100%
+        margin: 0
+        display: flex!important
+        flex-direction: column
+        align-items: flex-start
+        justify-content: flex-start
+        font-size: .9rem
+        box-sizing: border-box
+        padding: 1rem 1rem 2rem
+        height: 17rem        
+
+        .first_title
+            background: white
+            height: fit-content
+            display: flex
+            justify-content: space-between
+            align-items: flex-start
+            width: 100%
+            box-sizing: border-box
+            color: #515050
+            font-size: 1.5rem
+            font-weight: 600
+            text-transform: capitalize
+            color: #000
+
+            span
+                padding: .5rem
+                text-align: left
+                height: fit-content
+
+        #close
+            width: 1.1rem
+            
+        .the_message
+            text-align: left
+            margin: 1rem 0 2rem
+            color: #000
+            padding: 0 .5rem
+            height: 6rem
+
+            span
+                font-weight: 600
+
+        #modal_link
+            color: #4CA5F1
+            font-weight: 400
+            cursor: pointer
+
+            &:hover
+                text-decoration: underline
+                
+
+        .all_buttons
+            width: 100%
+
+            .buttons
+                display: flex
+                font-size: .85rem
+                flex-direction: row
+                gap: .6rem
+                align-items: center
+                justify-content: space-between
+
+                button
+                    padding: .6rem 1.2rem
+
+                button:nth-child(2)
+                    border: none
+                    outline: none
+                    background: #4CA5F1
+                    color: white
+
+                    &:hover
+                        background: #3d9bed
+
+                button:nth-child(1)
+                    border: none
+                    outline: none
+                    background: #a1cef443
+                    color: #4CA5F1
+
+                    &:hover
+                        background: #3d9bed
+
+                    &:hover
+                        background: #a1cff472
 
 // pop-up notify tab
 .notify
@@ -238,6 +340,12 @@
             height: 35rem
             overflow: scroll
             overflow-x: hidden
+
+        .chat_icon
+            width: 1rem
+            margin-left: .5rem
+            height: auto
+            cursor: pointer
 
         .the_title
             background: white
@@ -493,6 +601,50 @@
             #image_field
                 width: 1.5rem
 
+    #notes_section
+        width: 95%
+        height: 20rem
+        padding: .8rem .8rem 1.5rem 1.5rem
+        border-radius: 5px
+        bottom: 1rem
+        z-index: 5
+        position: absolute
+        box-shadow: 4px 0px 10px 4px #00000014
+        background: white
+        display: none
+        flex-direction: column
+    
+    .each_note
+        display: flex
+        flex-direction: column
+        width: 96%
+        padding: .3rem 0 1rem
+        margin: 0 1rem
+        border-bottom: 1px solid #a1cef443
+
+        .note_prtone
+            display: flex
+            flex-direction: row
+            width: 100%
+            justify-content: space-between
+            align-items: center
+            padding-bottom: .8rem
+
+        .note_stuff
+            display: flex
+            flex-direction: row
+            align-items: center
+
+            .note_p1
+                display: flex
+                flex-direction: column
+                gap: .2rem
+
+                .note_name
+                    font-size: .9rem
+                    font-weight: 600
+                    text-transform: capitalize
+
     .note
         display: flex
         flex-direction: row
@@ -502,35 +654,54 @@
         align-items: center
 
     .image_letter
-        background: #3D9BED
+        background: #E2F1F9
+        color: #3D9BED
         font-size: 1.1rem
         font-weight: 600
         padding: .8rem 1rem
-        color: white
         border-radius: 50px
         line-height: 1rem
         height: fit-content
         margin-right: .8rem
 
     .note_email
-        font-size: .9rem
-        font-weight: 600
+        font-size: .8rem
+        color: grey
 
     .note_response
         font-size: .8rem
-        padding-top: .5rem
+        padding-top: .3rem
         text-transform: capitalize
         font-weight: 500
+        width: fit-content
 
     .note_header
-        padding: 1rem 0
         text-transform: uppercase
         font-size: .7rem
         font-weight: 600
+        padding-bottom: 1rem
 
     #notes_div
-        height: 9rem
         overflow: scroll
+        flex: 1
+
+    .note_p2
+        padding: 0 0 0 .4rem 
+
+        .note_note:first-letter
+            text-transform: capitalize
+
+        .note_note
+            font-size: .8rem
+
+    .close_part
+        width: 100%
+        display: flex
+        justify-content: flex-end
+
+    #close_note
+        cursor: pointer
+        width: 1.1rem
 
 // request pop up
 .request_popup
@@ -563,6 +734,7 @@
             width: 100%
             box-sizing: border-box
             color: #515050
+            text-transform: capitalize
 
             img
                 width: 1.2rem
