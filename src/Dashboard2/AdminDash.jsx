@@ -57,7 +57,7 @@ const AdminDash = () => {
           const docSnapshot = querySnapshot.docs[0];
           const userData = docSnapshot.data();
 
-          setUserrole(userData.role);
+          setUserrole("admin");
           setUseremail(userData.email);
           setUsercompany(userData.name);
           console.log(userData.name)
@@ -69,7 +69,7 @@ const AdminDash = () => {
         console.error("Error getting user data:", error);
       });
   }, []);
-
+console.log(userrole)
   const propsGroup = {
     mail: useremail,
     company: usercomapny,
@@ -78,9 +78,12 @@ const AdminDash = () => {
   return (
     <div className="Dashboard">
       <>
+      {
+        userrole == "admin" ? (
+          <>
         <AdminSideNav />
         <div className="sub_dash">
-          <LilNav />
+          <LilNav {...propsGroup}/>
           {(() => {
             switch (page) {
               case "Dashboard":
@@ -98,6 +101,9 @@ const AdminDash = () => {
             }
           })()}
         </div>
+          </>
+        ) : (<span>Loading</span>)
+      }
       </>
     </div>
   );

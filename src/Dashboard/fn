@@ -23,17 +23,18 @@ const SendRequest = async (e, N_Id, u_ID, c_ID) => {
 
         try {
           const docRef = doc.ref;
-          // update the approval indes and adds approver response
+          // update the approval index and adds approver response
           if (fundRef.current == "") {
             await updateDoc(docRef, {
-              approvedBy: arrayUnion(messageToAdd),
+              messages: arrayUnion(messageToAdd),
               approvalIndex: currentValue + 1,
             });
           } else {
             await updateDoc(docRef, {
-              approvedBy: arrayUnion(messageToAdd),
+              messages: arrayUnion(messageToAdd),
               approvalIndex: currentValue + 1,
               fund: fundRef.current,
+              status: "funded",
             });
 
             // get the user department to send with the expense

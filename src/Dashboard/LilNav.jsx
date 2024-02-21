@@ -15,7 +15,7 @@ import {
 
 import "./Nav.sass";
 import { Context } from "../Utilities/Context";
-import { generateCustomId } from "../config/functions";
+import { deleteNotification, generateCustomId } from "../config/functions";
 import { openRequest, CloseReq } from "../config/Modals";
 
 import Swal from "sweetalert2";
@@ -35,6 +35,7 @@ import {
   updateArrayFirestore,
   updateFirestore,
   addToFirestore,
+  uploadImage,
 } from "../config/firebaseFunctions";
 
 const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
@@ -56,16 +57,23 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
 
   const [isApproved, setApproved] = useState(false);
   const [isRejected, setRejected] = useState(false);
+
+  const [isApproved2, setApproved2] = useState(false);
+  const [isRejected2, setRejected2] = useState(false);
+
   const [isNotification, setNotification] = useState(false);
   const [the_note, setThe_note] = useState([]);
 
   const notification = useRef([]);
   const the_response = useRef(null);
+  const verify_response = useRef(null);
+
   const fundRef = useRef("");
   const purposeRef = useRef("");
   const replyRef = useRef("");
   const noteRef = useRef([]);
   const countImgRef = useRef(0);
+  const imageRef = useRef(null);
 
   const [image, setImage] = useState(null);
   const [updateDataArray, setUpdateDataArray] = useState([]);
@@ -110,55 +118,110 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
   }, []);
 
   const fetchDataForUserId = async (userId) => {
-    try {
-      const userData = await fetchDataFromFirestore("users", "userId", userId);
-
-      let fieldValue = userData.messages;
-
-      // Deep comparison function for arrays of objects
-      const isDifferent = (arr1, arr2) => {
-        if (arr1.length !== arr2.length) return true;
-      };
-
-      // Check if the fetched data is different from the current state
-      if (isDifferent(fieldValue, notification.current)) {
-        const updatedFieldValues = await Promise.all(
-          fieldValue.map(async (item) => {
-            if (item.type === "request") {
-              // Extract userId from the body
-              const { reqId } = item.body;
-
-              const requestData = await fetchDataFromFirestore(
-                "requests",
-                "requset_id",
-                reqId
-              );
-              const requesterData = await fetchDataFromFirestore(
-                "users",
-                "userId",
-                requestData.user_id
-              );
-
-              // Create a new object with updated properties
-              const newObject = {
-                ...item,
-                userName:
-                  requesterData.first_name + " " + requesterData.last_name,
-              };
-              return newObject;
-            }
-            // Return the original item if it doesn't need modification
-            return item;
-          })
-        );
-        notification.current = updatedFieldValues;
-        console.log(updatedFieldValues);
-        setMessages(updatedFieldValues);
+    if(role == "admin"){
+      try {
+        const userData = await fetchDataFromFirestore("companies", "userId", userId);
+  
+        let fieldValue = userData.messages;
+  
+        // Deep comparison function for arrays of objects
+        const isDifferent = (arr1, arr2) => {
+          if (arr1.length !== arr2.length) return true;
+        };
+  
+        // Check if the fetched data is different from the current state
+        if (isDifferent(fieldValue, notification.current)) {
+          const updatedFieldValues = await Promise.all(
+            fieldValue.map(async (item) => {
+              if (item.type === "request") {
+                // Extract userId from the body
+                const { reqId } = item.body;
+  
+                const requestData = await fetchDataFromFirestore(
+                  "requests",
+                  "requset_id",
+                  reqId
+                );
+                const requesterData = await fetchDataFromFirestore(
+                  "users",
+                  "userId",
+                  requestData.user_id
+                );
+  
+                // Create a new object with updated properties
+                const newObject = {
+                  ...item,
+                  userName:
+                    requesterData.first_name + " " + requesterData.last_name,
+                };
+                return newObject;
+              }
+              // Return the original item if it doesn't need modification
+              return item;
+            })
+          );
+          notification.current = updatedFieldValues;
+          console.log(updatedFieldValues);
+          setMessages(updatedFieldValues);
+        }
+        return fieldValue;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
       }
-      return fieldValue;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+    }
+    else{
+
+      try {
+        const userData = await fetchDataFromFirestore("users", "userId", userId);
+  
+        let fieldValue = userData.messages;
+  
+        // Deep comparison function for arrays of objects
+        const isDifferent = (arr1, arr2) => {
+          if (arr1.length !== arr2.length) return true;
+        };
+  
+        // Check if the fetched data is different from the current state
+        if (isDifferent(fieldValue, notification.current)) {
+          const updatedFieldValues = await Promise.all(
+            fieldValue.map(async (item) => {
+              if (item.type === "request") {
+                // Extract userId from the body
+                const { reqId } = item.body;
+  
+                const requestData = await fetchDataFromFirestore(
+                  "requests",
+                  "requset_id",
+                  reqId
+                );
+                const requesterData = await fetchDataFromFirestore(
+                  "users",
+                  "userId",
+                  requestData.user_id
+                );
+  
+                // Create a new object with updated properties
+                const newObject = {
+                  ...item,
+                  userName:
+                    requesterData.first_name + " " + requesterData.last_name,
+                };
+                return newObject;
+              }
+              // Return the original item if it doesn't need modification
+              return item;
+            })
+          );
+          notification.current = updatedFieldValues;
+          console.log(updatedFieldValues);
+          setMessages(updatedFieldValues);
+        }
+        return fieldValue;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+      }
     }
   };
 
@@ -238,6 +301,90 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
     }
   };
 
+  const toggleApprove2 = (e) => {
+    console.log("clicked");
+    setApproved2(true);
+    setRejected2(false);
+    verify_response.current = "approve";
+
+    // Change the background color and text color of the "Approve" button
+    const approveButton = document.getElementById("approve1");
+    approveButton.style.backgroundColor = "#5fcf7d2e";
+    approveButton.style.color = "#5FCF7D";
+
+    // Reset the styles of the "Reject" button
+    const rejectButton = document.getElementById("reject1");
+    rejectButton.style.backgroundColor = "#3435362f";
+    rejectButton.style.color = "grey";
+
+    // displays the send button
+    const showClose = document.getElementById("close_request");
+    showClose.style.display = "block";
+
+    // displays the close button
+    const showSend = document.getElementById("send_button");
+    showSend.style.display = "none";
+  };
+
+  const toggleRejected2 = (e) => {
+    setRejected2(true);
+    setApproved2(false);
+    verify_response.current = "reject";
+
+    // Change the background color and text color of the "Reject" button
+    const rejectButton = document.getElementById("reject1");
+    rejectButton.style.backgroundColor = "#f07f6338";
+    rejectButton.style.color = "#F07F63";
+
+    // Reset the styles of the "Approve" button
+    const approveButton = document.getElementById("approve1");
+    approveButton.style.backgroundColor = "#3435362f";
+    approveButton.style.color = "grey";
+
+    // displays the send button
+    const showClose = document.getElementById("close_request");
+    showClose.style.display = "none";
+
+    // displays the close button
+    const showSend = document.getElementById("send_button");
+    showSend.style.display = "block";
+  };
+
+  const CloseRequest = async (type, notificationDetails, requester) => {
+    if (type == "send") {
+      //creates notification object for requester
+      const messageToAdd = {
+        message: "Request for Verification!",
+        body: {
+          reqId: notificationDetails.body.reqId,
+        },
+        notificationId: notificationDetails.notificationId,
+        type: "reverify",
+      };
+
+      // sends notification back to the requester
+      await updateArrayFirestore(
+        "users",
+        "userId",
+        requester,
+        "messages",
+        messageToAdd
+      );
+    } else if (type == "close") {
+      // upload closed status for request
+      await updateFirestore(
+        "requests",
+        "requset_id",
+        notificationDetails.body.reqId,
+        {
+          status: "closed",
+        }
+      );
+    }
+    deleteNotification(id, notificationDetails.notificationId);
+    CloseReq();
+  };
+
   const displayReply = (e) => {
     const replyRequest = document.getElementById("reply_request");
     if (e == "open") {
@@ -281,7 +428,7 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
         "requests",
         "requset_id",
         e,
-        "approvedBy",
+        "messages",
         messageToAdd
       );
 
@@ -297,6 +444,11 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
         const updatedFund = { fund: fundRef.current };
 
         await updateFirestore("requests", "requset_id", e, updatedFund);
+
+        // updates request status
+        await updateFirestore("requests", "requset_id", e, {
+          status: "funded",
+        });
 
         // get the user department to send with the expense
         let usersData = await fetchDataFromFirestore("users", "userId", u_ID);
@@ -554,13 +706,80 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
     var fileName = the_input.value.split("\\").pop(); // Extract just the file name
     childElement.innerHTML = `${fileName}`;
 
-    // setImage(file);
+    imageRef.current = file;
     console.log(the_input.files);
 
     countImgRef.current = countImgRef.current + 1;
 
     childElement.appendChild(img);
     the_div.appendChild(childElement);
+  };
+
+  const sendProof = async (request_id, old_notification_id) => {
+    // get the request details
+    let requestData = await fetchDataFromFirestore(
+      "requests",
+      "requset_id",
+      request_id
+    );
+
+    let notificationId = generateCustomId("NOT_", 5);
+
+    // upload image to firestore if an image was selected and get the url
+    let proof_url = await uploadImage(
+      imageRef.current,
+      "proof",
+      id,
+      request_id
+    );
+
+    // upload proof url
+    await updateFirestore("requests", "requset_id", request_id, {
+      proof_url: proof_url,
+    });
+
+    //creates notification object for approver
+    const messageToAdd2 = {
+      message: "New Request for Verification!",
+      body: {
+        reqId: request_id,
+      },
+      notificationId: notificationId,
+      type: "verify",
+    };
+
+    // sends notification to the verifier
+    await updateArrayFirestore(
+      "users",
+      "email",
+      requestData.verifier,
+      "messages",
+      messageToAdd2
+    );
+
+    // deletes notification from current users message array
+    let usersData2 = await fetchDataFromFirestore("users", "userId", id);
+
+    // Find the index of the element in the array with the specified ID
+    const indexToRemove = usersData2.messages.findIndex(
+      (element) => element.notificationId === old_notification_id
+    );
+
+    // Remove the element at the identified index
+    if (indexToRemove !== -1) {
+      const newArray = [...usersData2.messages];
+      newArray.splice(indexToRemove, 1);
+
+      // message object
+      const messageObject = {
+        messages: newArray,
+      };
+
+      // Update the document with the modified array
+      await updateFirestore("users", "userId", id, messageObject);
+    }
+
+    CloseReq();
   };
 
   const openNotification = async (e) => {
@@ -601,8 +820,8 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
         // check if the current approver has funding authority
         let funding = companyData.fundingAuthority === mail ? "block" : "none";
 
-        // check if the reques thas an image attached
-        let displayImage = requestData.is_attachment ? "block" : "block";
+        // check if the request has an image attached
+        let displayImage = requestData.is_attachment ? "block" : "none";
 
         let the_first_name = usersData.first_name;
         let the_last_name = usersData.last_name;
@@ -616,32 +835,43 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
           day: "numeric",
         });
 
+        console.log(noteRef.current);
+
         // approvers response
-        const updatedNotes = noteRef.current.map(
-          (item) => `
-              <div class='each_note'>
-                <div class='note_prtone'>
-                  <div class='note_stuff'>
-                    <div class='image_letter'>${item.email.charAt(0)}</div>
-                    <div class='note_p1'>
-                      <div class='note_name'>${console.log(
-                        fetchDataFromFirestore("users", "email", item.email)
-                      )}</div>
-                      <div class='note_email'>${item.email}</div>
+        const updatedNotes =
+          noteRef.current && noteRef.current.length > 0
+            ? noteRef.current.map(
+                (item) => `
+                  <div class='each_note'>
+                    <div class='note_prtone'>
+                      <div class='note_stuff'>
+                        <div class='image_letter'>${item.email.charAt(0)}</div>
+                        <div class='note_p1'>
+                          <div class='note_name'>${console.log(
+                            fetchDataFromFirestore("users", "email", item.email)
+                          )}</div>
+                          <div class='note_email'>${item.email}</div>
+                        </div>
+                      </div>
+                      <div class='note_response' > 
+                        <span style= 'color: ${
+                          item.response === "approve" ? "#5FCF7D" : "red"
+                        }'>
+                          ${
+                            item.response === "approve"
+                              ? "approved"
+                              : "rejected"
+                          }
+                        </span>
+                      </div>
+                    </div>
+                    <div class='note_p2'>
+                      <div class='note_note'>${item.note}</div>
                     </div>
                   </div>
-                  <div class='note_response' > <span style= 'color: ${
-                    item.response == "approve" ? "#5FCF7D" : "red"
-                  }'>${
-            item.response == "approve" ? "approved" : "rejected"
-          }</span></div>
-                </div>
-                <div class='note_p2'>
-                  <div class='note_note'>${item.note}</div>
-                </div>
-              </div>
-            `
-        );
+                `
+              )
+            : "<em style='line-height: 5rem; padding-left: 40%; text-align: center; color: grey; font-size: .8rem;'>No notes available</em>"; // Provide a default value when noteRef.current is null or empty
 
         const the_html = `
             <div class='first_title'>
@@ -665,9 +895,9 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
                 </div>
                 <div id='notes_section'>
                   <div class='close_part'>
+                    <div class='note_header'>Responses</div>
                     <img id='close_note' src='${iclose}' alt='alert_icon' style='cursor:pointer'/>
                   </div>
-                  <div class='note_header'>Responses</div>
                   <div id='notes_div'>
                     ${updatedNotes}
                   </div>
@@ -779,17 +1009,16 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
   };
 
   const selectNotification = async (e) => {
-    console.log(e);
+    // retrieve request data
+    let requestData = await fetchDataFromFirestore(
+      "requests",
+      "requset_id",
+      e.body.reqId
+    );
     if (e.type == "request") {
       await openNotification(e);
     }
     if (e.type == "update") {
-      // retrieve request data
-      let requestData = await fetchDataFromFirestore(
-        "requests",
-        "requset_id",
-        e.body.reqId
-      );
       if (requestData.status == "pending") {
         const the_html = `
             <div class='first_title'>
@@ -803,11 +1032,16 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
                 review the request details and click the button below to atach proof of 
                 execution. 
               </div>
-              
+              <div id="attach_div" class="swal3-input"></div>
               <div class='all_buttons'>
                 <div class='buttons'>
-                  <button id='send-button' class='button'>Attach proof of Execution</button>
-                  <button id='reply-button' class='button'>Send</button>
+                  <div id='attachment' class='fileinputs' >
+                    <input type='file' class='file' id='file_field'/>
+                    <div id='file_input'  class='fakefile'>
+                      <button id='send-button' class='button'>Attach proof of Execution</button>
+                    </div>
+                  </div>
+                  <button id='sendbutton' class='button'>Send</button>
                 </div>
               </div>
             </div>
@@ -821,8 +1055,12 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
             htmlContainer: "container",
           },
         });
-      }
-      if (requestData.status == "pending") {
+        // submit proof
+        const sendButton = document.getElementById("sendbutton");
+        sendButton.addEventListener("click", () =>
+          sendProof(e.body.reqId, e.notificationId)
+        );
+      } else if (requestData.status == "rejected") {
         const the_html = `
             <div class='first_title'>
               <span>Request Update!</span>
@@ -835,9 +1073,9 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
                 along with the provided reason for rejection.
               </div>
               <div class='all_buttons'>
-                <div class='buttons'>
-                  <button id='send-button' class='button' style='opacity: 0'>Attach proof of Execution</button>
-                  <button id='request_link' class='button' style='color: white'>View Request details</button>
+                <div class='buttons' style='flex-direction: row-reverse'>
+                  <img id='trash' src='${trash}' class='trash_icon' alt='alert_icon' style='cursor:pointer; width: 1.2rem'/>
+                  <button id='modal_link' class='button' style='color: white'>View Request details</button>
                 </div>
               </div>
             </div>
@@ -851,8 +1089,7 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
             htmlContainer: "container",
           },
         });
-      }
-      if (requestData.status == "pending") {
+      } else if (requestData.status == "closed") {
         const the_html = `
             <div class='first_title'>
               <span>Request Update!</span>
@@ -864,10 +1101,11 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
                 closed. If you have any questions or need additional information 
                 regarding this closure click the button below.
               </div>
+
               <div class='all_buttons'>
                 <div class='buttons'>
                   <button id='send-button' class='button' style='opacity: 0'>Attach proof of Execution</button>
-                  <button id='request_link' class='button' style='color: white'>View Request details</button>
+                  <button id='modal_link' class='button' style='color: white'>View Request details</button>
                 </div>
               </div>
             </div>
@@ -887,11 +1125,143 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
       const closeButton = document.getElementById("close");
       closeButton.addEventListener("click", () => CloseReq());
 
+      // open request details
       const requestModal = document.getElementById("modal_link");
       requestModal.addEventListener("click", () => openRequest(requestData));
 
-      const requestLink = document.getElementById("request_link");
-      requestLink.addEventListener("click", () => openRequest(requestData));
+      const file_itself = document.getElementById("file_field");
+      const fileDiv = document.getElementById("attach_div");
+      file_itself.addEventListener("input", () =>
+        Attachment(fileDiv, file_itself)
+      );
+    }
+    if (e.type == "verify") {
+      const the_html = `
+            <div class='first_title'>
+              <span>New Request for Verification!</span>
+              <img id='close' src='${iclose}' alt='alert_icon' style='cursor:pointer'/>
+            </div>
+            <div class='verify_dets'>
+              <div class='the_message'>
+                A financial request with title <span>${requestData.title}</span> has been 
+                sent to you for verification of execution. Click <span id='modal_link'>here</span> to
+                review the request details and click the button below to either approve 
+                or reject the proof. 
+              </div>
+              <div class='verify_info'>
+                <span>Proof of Execution - <a href=${requestData.proof_url} target="_blank" id='proof_link'>Proof</span></a>
+              </div>
+                  <div class='all_buttons'>
+                    <div class='buttons'>
+                    <div class='response'>
+                    <div class='tag' id='approve1'>
+                      <span class='dot'>.</span>
+                      Approve
+                    </div>
+                    <div class='tag' id='reject1'>
+                      <span class='dot'>.</span>
+                      Reject
+                    </div>
+                  </div>
+                  <button id='send_button' class='button'>Send</button>
+                  <button id='close_request' class='button'>Close</button>
+                </div>
+              </div>
+            </div>
+          `;
+
+      const swal = Swal.fire({
+        html: the_html,
+        showConfirmButton: false,
+        customClass: {
+          popup: "verify",
+          htmlContainer: "container",
+        },
+      });
+
+      // Close modal
+      const closeButton = document.getElementById("close");
+      closeButton.addEventListener("click", () => CloseReq());
+
+      // open request details
+      const requestModal = document.getElementById("modal_link");
+      requestModal.addEventListener("click", () => openRequest(requestData));
+
+      // records approve response
+      const approveRequest = document.getElementById("approve1");
+      approveRequest.addEventListener("click", () => toggleApprove2());
+
+      // records reject response
+      const rejectRequest = document.getElementById("reject1");
+      rejectRequest.addEventListener("click", () => toggleRejected2());
+
+      // snd response
+      const sendRequest = document.getElementById("send_button");
+      sendRequest.addEventListener("click", () =>
+        CloseRequest("send", e, requestData.user_id)
+      );
+
+      // close request
+      const closeRequest = document.getElementById("close_request");
+      closeRequest.addEventListener("click", () =>
+        CloseRequest("close", e, requestData.user_id)
+      );
+    }
+    if (e.type == "reverify") {
+      const the_html = `
+            <div class='first_title'>
+              <span>Request Update!</span>
+              <img id='close' src='${iclose}' alt='alert_icon' style='cursor:pointer'/>
+            </div>
+            <div class='request_dets'>
+              <div class='the_message'>
+              Your proof of execution for your financial request with title <span>${requestData.title}</span> has been 
+              has been rejected. Click <span id='modal_link'>here</span> to
+                review the request details and click the button below to attach proof of 
+                execution. 
+              </div>
+              <div id="attach_div" class="swal3-input"></div>
+              <div class='all_buttons'>
+                <div class='buttons'>
+                  <div id='attachment' class='fileinputs' >
+                    <input type='file' class='file' id='file_field'/>
+                    <div id='file_input'  class='fakefile'>
+                      <button id='send-button' class='button'>Attach proof of Execution</button>
+                    </div>
+                  </div>
+                  <button id='sendbutton' class='button'>Send</button>
+                </div>
+              </div>
+            </div>
+          `;
+
+      const swal = Swal.fire({
+        html: the_html,
+        showConfirmButton: false,
+        customClass: {
+          popup: "update",
+          htmlContainer: "container",
+        },
+      });
+      // submit proof
+      const sendButton = document.getElementById("sendbutton");
+      sendButton.addEventListener("click", () =>
+        sendProof(e.body.reqId, e.notificationId)
+      );
+
+      // Close modal
+      const closeButton = document.getElementById("close");
+      closeButton.addEventListener("click", () => CloseReq());
+
+      // open request details
+      const requestModal = document.getElementById("modal_link");
+      requestModal.addEventListener("click", () => openRequest(requestData));
+
+      const file_itself = document.getElementById("file_field");
+      const fileDiv = document.getElementById("attach_div");
+      file_itself.addEventListener("input", () =>
+        Attachment(fileDiv, file_itself)
+      );
     }
   };
 
@@ -901,14 +1271,14 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
       "requset_id", // Pass reqId as an argument or get it from your component state
       item.body.reqId
     );
-    console.log(requestInfo);
     return requestInfo.title;
   };
 
   useEffect(() => {
     const fetchData = async (notifications) => {
+      console.log(notifications);
       const promises = notifications
-        .filter((item) => item.type === "update")
+        .filter((item) => item.type === "update" || item.type === "verify")
         .map(async (item) => {
           const title = await displayRequestTitle(item);
           return { item, title };
@@ -940,7 +1310,6 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
         <li>
           {messages.some((obj) => obj.status == "pending") ? (
             <>
-              {}
               <img
                 src={bell2}
                 alt="bell"
@@ -1039,10 +1408,51 @@ const LilNav = ({ firstname, lastname, mail, company, role, dept, url }) => {
                                 </div>
                               </>
                             );
-                          case "notificationType3":
+                          case "verify":
                             return (
                               <>
-                                {/* Display elements for "notificationType3" */}
+                                <img
+                                  src={wait}
+                                  alt="notification_icon"
+                                  className="wait_icon"
+                                />
+                                <div className="notification_details">
+                                  <div
+                                    className="message"
+                                    style={{ fontWeight: 600 }}
+                                  >
+                                    You have a new request for verification!
+                                  </div>
+                                  <div className="message_timeframe">
+                                    1:30 pm on 23-10-2024
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          case "reverify":
+                            return (
+                              <>
+                                <img
+                                  src={wait}
+                                  alt="notification_icon"
+                                  className="wait_icon"
+                                />
+                                <div className="notification_details">
+                                  <div
+                                    className="message"
+                                    style={{
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    Request Update!
+                                  </div>
+                                    <div className="notification_text">
+                                      Your proof of execution has been rejected.
+                                    </div>
+                                  <div className="message_timeframe">
+                                    1:30 pm on 23-10-2024
+                                  </div>
+                                </div>
                               </>
                             );
                           default:

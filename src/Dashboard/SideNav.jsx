@@ -176,12 +176,6 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
     the_div.appendChild(childElement);
   };
 
-  // const handleFileChange = (event) => {
-  //   console.log(event)
-  //   const file = event.target.files[0];
-  //   setImage(file);
-  // };
-
   // handles request actions
   const DeleteReq = () => {
     Swal.close();
@@ -225,8 +219,9 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
           approvalIndex: 0,
           approvers: newApprovers,
           verifier: companyData.verificationAuthority,
+          proof_url: "",
+          verified: false,
           messages: [],
-          is_link: false,
           image_url: image_url,
         };
 
@@ -257,8 +252,6 @@ const SideNav = ({ firstname, lastname, mail, company, role, dept }) => {
       } catch (error) {
         console.error("Error querying Firestore:", error);
       }
-
-      // newRequest(customId, id);
 
       Swal.close();
 

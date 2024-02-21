@@ -111,7 +111,7 @@ export const uploadImage = (file, type, id, reqID) => {
     console.log(file);
     const timestamp = new Date().getTime();
     const newFileName =
-      type === "request"
+      type === "request" || type === "proof"
         ? `${reqID}_${file.name}`
         : `${timestamp}_${file.name}`;
 
@@ -137,7 +137,7 @@ export const uploadImage = (file, type, id, reqID) => {
 
       console.log("Image uploaded successfully");
 
-      if (type === "request") {
+      if (type === "request" || type === "proof") {
         const downloadURL = await getDownloadURL(storageRef);
         console.log("yes", downloadURL);
         resolve(downloadURL);

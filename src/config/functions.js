@@ -1,3 +1,4 @@
+import { fetchDataFromFirestore, updateFirestore } from "./firebaseFunctions";
 
 export const newRequest = async (reqId, userId) => {
     // Make an API call to the backend server
@@ -61,4 +62,29 @@ export const todaysDate = () => {
     const the_date = `${month}/${date}/${year}`;
     return the_date;
 };
+
+export const deleteNotification = async (id, old_notification_id) => {
+    // deletes notification from current users message array
+    let usersData2 = await fetchDataFromFirestore("users", "userId", id);
+
+    // Find the index of the element in the array with the specified ID
+    const indexToRemove = usersData2.messages.findIndex(
+      (element) => element.notificationId === old_notification_id
+    );
+
+    // Remove the element at the identified index
+    if (indexToRemove !== -1) {
+      const newArray = [...usersData2.messages];
+      newArray.splice(indexToRemove, 1);
+
+      // message object
+      const messageObject = {
+        messages: newArray,
+      };
+
+      // Update the document with the modified array
+      await updateFirestore("users", "userId", id, messageObject);
+    }
+
+}
 
